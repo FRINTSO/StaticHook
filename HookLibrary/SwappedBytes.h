@@ -18,7 +18,7 @@ namespace HookLibrary {
 			BYTE* src;
 			BYTE* bytes;
 			DWORD length;
-
+			
 			friend SwappedBytes&& Detour(BYTE* src, BYTE* dst, DWORD length);
 			friend SwappedBytes WriteBytes(BYTE* src, const char* bytes, DWORD length);
 		};
