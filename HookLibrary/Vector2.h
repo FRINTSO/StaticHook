@@ -8,8 +8,8 @@ namespace HookLibrary {
 		public:
 			float x, y;
 		public:
-			Vector2();
-			Vector2(float x, float y);
+			explicit Vector2();
+			explicit Vector2(float x, float y);
 
 			inline float Magnitude() const;
 			inline float SqrMagnitude() const;

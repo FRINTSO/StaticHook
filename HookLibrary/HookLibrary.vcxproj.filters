@@ -25,8 +25,8 @@
     <Filter Include="DataStructures\Vector4">
       <UniqueIdentifier>{e8ce569d-6381-4e4c-895c-b992cfed7036}</UniqueIdentifier>
     </Filter>
-    <Filter Include="HookUtils">
-      <UniqueIdentifier>{f5ce5cbb-d20c-4309-9e63-819ce7d5cd7e}</UniqueIdentifier>
+    <Filter Include="SwappedBytes">
+      <UniqueIdentifier>{cff1f45a-10c9-4d7c-83d3-fcfc10ec5605}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -42,11 +42,11 @@
     <ClInclude Include="HookLibrary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HookUtils.h">
-      <Filter>HookUtils</Filter>
-    </ClInclude>
     <ClInclude Include="DataTypes.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SwappedBytes.h">
+      <Filter>SwappedBytes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -59,8 +59,8 @@
     <ClCompile Include="Vector4.cpp">
       <Filter>DataStructures\Vector4</Filter>
     </ClCompile>
-    <ClCompile Include="HookUtils.cpp">
-      <Filter>HookUtils</Filter>
+    <ClCompile Include="SwappedBytes.cpp">
+      <Filter>SwappedBytes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -3,13 +3,13 @@
 
 namespace HookLibrary {
 	namespace DataStructures {
-		class Vector3
-		{
+
+		class Vector3 {
 		public:
 			float x, y, z;
 		public:
-			Vector3();
-			Vector3(float x, float y, float z);
+			explicit Vector3();
+			explicit Vector3(float x, float y, float z);
 
 			float Magnitude() const;
 			float SqrMagnitude() const;
@@ -29,7 +29,8 @@ namespace HookLibrary {
 			bool operator==(const Vector3& other) const;
 			bool operator!=(const Vector3& other) const;
 		};
-	}
-}
+
+	} // namespace DataStructures
+} // namespace HookLibrary
 
 #endif // !STATICHOOK_VECTOR3_H_
