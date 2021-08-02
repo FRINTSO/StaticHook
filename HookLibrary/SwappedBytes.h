@@ -10,6 +10,7 @@ namespace HookLibrary {
 		public:
 			void Restore();
 
+			SwappedBytes(SwappedBytes&& other) noexcept;
 			~SwappedBytes();
 		private:
 			SwappedBytes();
