@@ -4,6 +4,9 @@
 
 #include <utility>
 
+// Destination: skriver data till
+// Source: läser data från
+
 namespace HookLibrary {
 	namespace HookUtils {
 
@@ -18,7 +21,6 @@ namespace HookLibrary {
 		}
 
 		SwappedBytes::~SwappedBytes() {
-			delete src;
 			delete[] bytes;
 
 			src = nullptr;
@@ -27,76 +29,95 @@ namespace HookLibrary {
 		}
 
 #if _WIN64
-		SwappedBytes Detour(BYTE* src, BYTE* dst, DWORD length) {
-			/*if (length < 14) {
-				return false;
+		SwappedBytes Detour(BYTE* dst, BYTE* function, DWORD length) {
+			if (length < 14) {
+				return SwappedBytes();
 			}
+
+			SwappedBytes sb(dst, length);
 
 			DWORD currentProtection;
 
-			VirtualProtect(src, length, PAGE_EXECUTE_READWRITE, &currentProtection);
+			VirtualProtect(dst, length, PAGE_EXECUTE_READWRITE, &currentProtection);
 
-			*src = 0xFF;
-			*(src + 0x1) = 0x25;
+			*dst = 0xFF;
+			*(dst + 0x1) = 0x25;
 
 			for (DWORD x = 2; x < 7; x++)
 			{
-				*(src + x) = 0x00;
+				*(dst + x) = 0x00;
 			}
 
-			*(QWORD*)(src + 0x6) = (QWORD)dst;
+			*(QWORD*)(dst + 0x6) = (QWORD)function;
 			for (DWORD x = 14; x < length; x++)
 			{
-				*(src + x) = 0x90;
+				*(dst + x) = 0x90;
 			}
 
-			VirtualProtect(src, length, currentProtection, &currentProtection);
+			VirtualProtect(dst, length, currentProtection, &currentProtection);
 
-			return true;*/
+			return sb;
 		}
 #else
-		SwappedBytes&& Detour(BYTE* src, BYTE* dst, DWORD length) {
+		SwappedBytes Detour(BYTE* dst, BYTE* function, DWORD length) {
 
 			if (length < 5) {
 				return SwappedBytes();
 			}
 
-			SwappedBytes sb(src, length);
+			SwappedBytes sb(dst, length);
 
 			DWORD currentProtection;
 
-			VirtualProtect(src, length, PAGE_EXECUTE_READWRITE, &currentProtection);
+			VirtualProtect(dst, length, PAGE_EXECUTE_READWRITE, &currentProtection);
 
-			DWORD relativeAddress = dst - src - 5;
+			DWORD relativeAddress = function - dst - 5;
 
-			*src = 0xE9;
+			*dst = 0xE9;
 
-			*(DWORD*)(src + 1) = relativeAddress;
+			*(DWORD*)(dst + 1) = relativeAddress;
 
 			for (DWORD x = 0x5; x < length; x++)
 			{
-				*(src + x) = 0x90;
+				*(dst + x) = 0x90;
 			}
 
-			VirtualProtect(src, length, currentProtection, &currentProtection);
+			VirtualProtect(dst, length, currentProtection, &currentProtection);
 
-			return std::move(sb);
+			return sb;
 		}
 #endif
 
-		SwappedBytes WriteBytes(BYTE* src, const char* bytes, DWORD length) {
-			SwappedBytes sb(src, length);
+		SwappedBytes WriteBytes(BYTE* dst, const char* bytes, DWORD length) {
+			SwappedBytes sb(dst, length);
 
 			DWORD currentProtection;
 
-			VirtualProtect(src, length, PAGE_EXECUTE_READWRITE, &currentProtection);
+			VirtualProtect(dst, length, PAGE_EXECUTE_READWRITE, &currentProtection);
 
 			for (DWORD x = 0; x < length; x++)
 			{
-				*(src + x) = *(bytes + x);
+				*(dst + x) = *(bytes + x);
 			}
 
-			VirtualProtect(src, length, currentProtection, &currentProtection);
+			VirtualProtect(dst, length, currentProtection, &currentProtection);
+
+			return sb;
+		}
+
+		SwappedBytes Nop(BYTE* dst, DWORD length) {
+			SwappedBytes sb(dst, length);
+
+			DWORD currentProtection;
+
+			VirtualProtect(dst, length, PAGE_EXECUTE_READWRITE, &currentProtection);
+
+			for (DWORD x = 0; x < length; x++)
+			{
+				*(dst + x) = 0x90;
+			}
+
+			VirtualProtect(dst, length, currentProtection, &currentProtection);
 
 			return sb;
 		}
