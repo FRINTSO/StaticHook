@@ -128,7 +128,10 @@ namespace HookLibrary {
 			VirtualProtect(src, length, PAGE_EXECUTE_READWRITE, &currentProtection);
 
 			if (src && bytes) {
-				memcpy_s(src, length, bytes, length);
+				for (DWORD x = 0; x < length; x++)
+				{
+					*(src + x) = *(bytes + x);
+				}
 			}
 
 			VirtualProtect(src, length, currentProtection, &currentProtection);
