@@ -10,10 +10,13 @@ namespace HookLibrary {
 		public:
 			void Restore();
 
+			SwappedBytes(SwappedBytes&& other) noexcept;
 			~SwappedBytes();
 		private:
 			SwappedBytes();
 			SwappedBytes(BYTE* src, DWORD length);
+
+			SwappedBytes(const SwappedBytes&) = delete;
 
 			BYTE* src;
 			BYTE* bytes;

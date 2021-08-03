@@ -20,6 +20,13 @@ namespace HookLibrary {
 			memcpy_s(bytes, length, src, length);
 		}
 
+		SwappedBytes::SwappedBytes(SwappedBytes&& other) noexcept
+			: src(other.src), bytes(other.bytes), length(other.length) {
+			other.src = nullptr;
+			other.bytes = nullptr;
+			other.length = NULL;
+		}
+
 		SwappedBytes::~SwappedBytes() {
 			delete[] bytes;
 
