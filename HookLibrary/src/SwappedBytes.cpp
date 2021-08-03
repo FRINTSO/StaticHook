@@ -24,7 +24,7 @@ namespace HookLibrary {
 			: src(other.src), bytes(other.bytes), length(other.length) {
 			other.src = nullptr;
 			other.bytes = nullptr;
-			length = NULL;
+			other.length = NULL;
 		}
 
 		SwappedBytes::~SwappedBytes() {

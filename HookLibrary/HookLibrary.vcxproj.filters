@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="DataStructures">
       <UniqueIdentifier>{56c2c6b7-d310-428e-a081-514145c9be9e}</UniqueIdentifier>
     </Filter>
@@ -30,36 +26,36 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Vector2.h">
+    <ClInclude Include="src\Vector2.h">
       <Filter>DataStructures\Vector2</Filter>
     </ClInclude>
-    <ClInclude Include="Vector3.h">
+    <ClInclude Include="src\Vector3.h">
       <Filter>DataStructures\Vector3</Filter>
     </ClInclude>
-    <ClInclude Include="Vector4.h">
+    <ClInclude Include="src\Vector4.h">
       <Filter>DataStructures\Vector4</Filter>
     </ClInclude>
-    <ClInclude Include="HookLibrary.h">
+    <ClInclude Include="src\HookLibrary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DataTypes.h">
+    <ClInclude Include="src\DataTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SwappedBytes.h">
+    <ClInclude Include="src\SwappedBytes.h">
       <Filter>SwappedBytes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Vector2.cpp">
+    <ClCompile Include="src\Vector2.cpp">
       <Filter>DataStructures\Vector2</Filter>
     </ClCompile>
-    <ClCompile Include="Vector3.cpp">
+    <ClCompile Include="src\Vector3.cpp">
       <Filter>DataStructures\Vector3</Filter>
     </ClCompile>
-    <ClCompile Include="Vector4.cpp">
+    <ClCompile Include="src\Vector4.cpp">
       <Filter>DataStructures\Vector4</Filter>
     </ClCompile>
-    <ClCompile Include="SwappedBytes.cpp">
+    <ClCompile Include="src\SwappedBytes.cpp">
       <Filter>SwappedBytes</Filter>
     </ClCompile>
   </ItemGroup>

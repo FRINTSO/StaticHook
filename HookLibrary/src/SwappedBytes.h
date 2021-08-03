@@ -16,6 +16,8 @@ namespace HookLibrary {
 			SwappedBytes();
 			SwappedBytes(BYTE* src, DWORD length);
 
+			SwappedBytes(const SwappedBytes&) = delete;
+
 			BYTE* src;
 			BYTE* bytes;
 			DWORD length;
