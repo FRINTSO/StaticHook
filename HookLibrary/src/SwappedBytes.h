@@ -41,10 +41,35 @@ namespace HookLibrary {
 			BYTE originalBytes[S]{0};
 		};
 
+#ifdef _WIN64
+		template<size_t S>
+		SwappedBytes<S> Detour(BYTE* dst, BYTE* function) {
+			if (S < 14) {
+				return SwappedBytes<NULL>();
+			}
+
+			SwappedBytes<S> sb(dst);
+
+			DWORD currentProtection;
+
+			VirtualProtect(dst, S, PAGE_EXECUTE_READWRITE, &currentProtection);
+
+			*(HookLibrary::WORD*)dst = 0xFF25;
+
+			memset((dst + 2), 0x0, (S-2));
+
+			*(QWORD*)(dst + 0x6) = (QWORD)function;
+			memset((dst + 14), 0x90, (S - 14));
+
+			VirtualProtect(dst, S, currentProtection, &currentProtection);
+
+			return sb;
+		}
+#else
 		template<size_t S>
 		SwappedBytes<S> Detour(BYTE* dst, BYTE* function) {
 			if (S < 5) {
-				return SwappedBytes<NULL>();
+				return SwappedBytes<S>();
 			}
 
 			SwappedBytes<S> sb(dst);
@@ -67,7 +92,28 @@ namespace HookLibrary {
 
 			return sb;
 		}
+#endif
 
+#ifdef _WIN64
+		template<size_t S>
+		SwappedBytes<S> TrampHook(BYTE* src, BYTE* dst) {
+			if (S < 14) {
+				return SwappedBytes<NULL>();
+			}
+
+			BYTE* gateway = (BYTE*)VirtualAlloc(0, S, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+
+			memcpy(gateway, src, S);
+
+			uintptr_t gatewayRelativeAddress = src - gateway - 5;
+
+			*((HookLibrary::WORD*)(gateway + S)) = 0xFF25;
+
+			*(uintptr_t*)((uintptr_t)gateway + S + 1) = gatewayRelativeAddress;
+
+			return Detour(src, dst, S);
+		}
+#else
 		template<size_t S>
 		SwappedBytes<S> TrampHook(BYTE* src, BYTE* dst) {
 			if (S < 5) {
@@ -86,6 +132,7 @@ namespace HookLibrary {
 
 			return Detour(src, dst, S);
 		}
+#endif
 
 		template<size_t S>
 		SwappedBytes<S> WriteBytes(BYTE* dst, const char* bytes) {
@@ -95,11 +142,7 @@ namespace HookLibrary {
 
 			VirtualProtect(dst, S, PAGE_EXECUTE_READWRITE, &currentProtection);
 
-			for (DWORD x = 0; x < S; x++)
-			{
-				*(dst + x) = *(bytes + x);
-			}
-
+			memcpy(dst, bytes, S);
 			VirtualProtect(dst, S, currentProtection, &currentProtection);
 
 			return sb;
@@ -108,16 +151,11 @@ namespace HookLibrary {
 		template<size_t S>
 		SwappedBytes<S> Nop(BYTE* dst) {
 			SwappedBytes<S> sb(dst);
-
 			DWORD currentProtection;
 
 			VirtualProtect(dst, S, PAGE_EXECUTE_READWRITE, &currentProtection);
 
-			for (DWORD x = 0; x < S; x++)
-			{
-				*(dst + x) = 0x90;
-			}
-
+			memset(dst, 0x90, S);
 			VirtualProtect(dst, S, currentProtection, &currentProtection);
 
 			return sb;
