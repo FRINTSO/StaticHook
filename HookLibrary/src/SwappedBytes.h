@@ -45,7 +45,7 @@ namespace HookLibrary {
 		template<size_t S>
 		SwappedBytes<S> Detour(BYTE* dst, BYTE* function) {
 			if (S < 14) {
-				return SwappedBytes<NULL>();
+				return SwappedBytes<S>();
 			}
 
 			SwappedBytes<S> sb(dst);
@@ -117,7 +117,7 @@ namespace HookLibrary {
 		template<size_t S>
 		SwappedBytes<S> TrampHook(BYTE* src, BYTE* dst) {
 			if (S < 5) {
-				return SwappedBytes<NULL>();
+				return SwappedBytes<1>();
 			}
 
 			BYTE* gateway = (BYTE*)VirtualAlloc(0, S, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
