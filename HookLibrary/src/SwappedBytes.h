@@ -18,16 +18,18 @@ namespace HookLibrary {
 
 			SwappedBytes(const SwappedBytes&) = delete;
 
-			BYTE* src;
-			BYTE* bytes;
-			DWORD length;
+			BYTE* src{ nullptr };
+			BYTE* bytes{ nullptr };
+			DWORD length{ 0 };
 			
 			friend SwappedBytes Detour(BYTE* dst, BYTE* function, DWORD length);
+			friend SwappedBytes TrampHook(BYTE* src, BYTE* dst, DWORD length);
 			friend SwappedBytes WriteBytes(BYTE* dst, const char* bytes, DWORD length);
 			friend SwappedBytes Nop(BYTE* dst, DWORD length);
 		};
 
 		SwappedBytes Detour(BYTE* dst, BYTE* function, DWORD length);
+		SwappedBytes TrampHook(BYTE* src, BYTE* dst, DWORD length);
 		SwappedBytes WriteBytes(BYTE* dst, const char* bytes, DWORD length);
 		SwappedBytes Nop(BYTE* dst, DWORD length);
 

@@ -32,7 +32,7 @@ namespace HookLibrary {
 
 			src = nullptr;
 			bytes = nullptr;
-			length = NULL;
+			length = 0;
 		}
 
 #if _WIN64
@@ -94,6 +94,22 @@ namespace HookLibrary {
 			return sb;
 		}
 #endif
+
+		SwappedBytes TrampHook(BYTE* src, BYTE* dst, DWORD length) {
+			if (length < 5) return SwappedBytes();
+			
+			BYTE* gateway = (BYTE*)VirtualAlloc(0, length, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+
+			memcpy_s(gateway, length, src, length);
+
+			uintptr_t gatewayRelativeAddress = src - gateway - 5;
+
+			*(gateway + length) = 0xE9;
+
+			*(uintptr_t*)((uintptr_t)gateway + length + 1) = gatewayRelativeAddress;
+
+			return Detour(src, dst, length);
+		}
 
 		SwappedBytes WriteBytes(BYTE* dst, const char* bytes, DWORD length) {
 			SwappedBytes sb(dst, length);
