@@ -25,12 +25,12 @@ namespace HookLibrary {
 
 		void Hook::Enable() {
 			memcpy(originalBytes, src, length);
-			*(uintptr_t*)PtrToGatewayFnPtr = (uintptr_t)TrampHook32(src, dst, length);
+			*(uintptr_t*)PtrToGatewayFnPtr = (uintptr_t)Memory::TrampHook32(src, dst, length);
 			bStatus = true;
 		}
 
 		void Hook::Disable() {
-			Patch(src, originalBytes, length);
+			Memory::Patch(src, originalBytes, length);
 			bStatus = false;
 		}
 

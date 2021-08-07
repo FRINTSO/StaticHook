@@ -67,9 +67,6 @@
     <ClCompile Include="src\Vector4.cpp">
       <Filter>DataStructures\Vector4</Filter>
     </ClCompile>
-    <ClCompile Include="src\SwappedBytes.cpp">
-      <Filter>SwappedBytes</Filter>
-    </ClCompile>
     <ClCompile Include="src\Hook.cpp">
       <Filter>Hook</Filter>
     </ClCompile>

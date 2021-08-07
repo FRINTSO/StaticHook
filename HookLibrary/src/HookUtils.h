@@ -9,16 +9,18 @@
 
 namespace HookLibrary {
 	namespace HookUtils {
+		namespace Memory {
 
-		void Patch(BYTE* dst, BYTE* src, DWORD size);
-		void PatchEx(BYTE* dst, BYTE* src, DWORD size, HANDLE hProcess);
-		void Nop(BYTE* dst, DWORD size);
-		void NopEx(BYTE* dst, DWORD size, HANDLE hProcess);
-		uintptr_t FindDMAAddy(uintptr_t ptr, std::vector<DWORD> offsets);
+			void Patch(BYTE* dst, BYTE* src, DWORD size);
+			void PatchEx(BYTE* dst, BYTE* src, DWORD size, HANDLE hProcess);
+			void Nop(BYTE* dst, DWORD size);
+			void NopEx(BYTE* dst, DWORD size, HANDLE hProcess);
+			uintptr_t FindDMAAddy(uintptr_t ptr, std::vector<DWORD> offsets);
 
-		bool Detour32(BYTE* src, BYTE* dst, const DWORD length);
-		BYTE* TrampHook32(BYTE* src, BYTE* dst, const DWORD length);
+			bool Detour32(BYTE* src, BYTE* dst, const DWORD length);
+			BYTE* TrampHook32(BYTE* src, BYTE* dst, const DWORD length);
 
+		} // namespace Memory
 	} // namespace HookUtils
 } // namespace HookLibrary
 
