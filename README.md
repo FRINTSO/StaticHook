@@ -7,6 +7,7 @@ StaticHook is a static library written in C++ that provides functionality in for
 * [Technologies](#technologies)
 * [Setup](#setup)
 * [Features](#features)
+* [Code Examples](#code-examples)
 
 ## General info
 
@@ -20,3 +21,7 @@ This statically-linked library provides functionality for creating DLL injection
 
 ## Features
 * Write and read bytes internally or externally
+#### To Do:
+* Allow for memory allocation in the virtual address space of the hijacked process, in order to eliminate 14-byte jumps in 64-bit applications
+
+## Code Examples
