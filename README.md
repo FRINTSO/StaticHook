@@ -26,4 +26,5 @@ This statically-linked library provides functionality for creating DLL injection
 #### To Do:
 * Allow for memory allocation in the virtual address space of the hijacked process, in order to eliminate 14-byte jumps in 64-bit applications
 * Add matrix data structure 
+* Add a DLL Injector
 ## Code Examples
