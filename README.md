@@ -21,7 +21,9 @@ This statically-linked library provides functionality for creating DLL injection
 
 ## Features
 * Write and read bytes internally or externally
+* Basic data types including `BYTE`, `WORD`, `DWORD`, `QWORD`
+* Data structures such as `Vector2`, `Vector3`, `Vector4`
 #### To Do:
 * Allow for memory allocation in the virtual address space of the hijacked process, in order to eliminate 14-byte jumps in 64-bit applications
-
+* Add matrix data structure 
 ## Code Examples
