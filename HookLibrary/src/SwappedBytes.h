@@ -9,7 +9,7 @@
 namespace HookLibrary {
 	namespace HookUtils {
 
-		template<size_t S>
+		template<DWORD S>
 		class SwappedBytes {
 		public:
 			SwappedBytes(SwappedBytes&& other) noexcept
@@ -25,10 +25,10 @@ namespace HookLibrary {
 				Memory::Patch(src, originalBytes, S);
 			}
 
-			template<size_t S1> friend SwappedBytes<S1> Detour(BYTE* dst, BYTE* function);
-			template<size_t S1> friend SwappedBytes<S1> TrampHook(BYTE* src, BYTE* dst);
-			template<size_t S1> friend SwappedBytes<S1> WriteBytes(BYTE* dst, const char* bytes);
-			template<size_t S1> friend SwappedBytes<S1> Nop(BYTE* dst);
+			template<DWORD S1> friend SwappedBytes<S1> Detour(BYTE* dst, BYTE* function);
+			template<DWORD S1> friend SwappedBytes<S1> TrampHook(BYTE* src, BYTE* dst);
+			template<DWORD S1> friend SwappedBytes<S1> WriteBytes(BYTE* dst, const char* bytes);
+			template<DWORD S1> friend SwappedBytes<S1> Nop(BYTE* dst);
 		private:
 			SwappedBytes() = default;
 			SwappedBytes(BYTE* src)
@@ -42,7 +42,7 @@ namespace HookLibrary {
 		};
 
 #ifdef _WIN64
-		template<size_t S>
+		template<DWORD S>
 		SwappedBytes<S> Detour(BYTE* dst, BYTE* function) {
 			if (S < 14) {
 				return SwappedBytes<S>();
@@ -54,9 +54,9 @@ namespace HookLibrary {
 
 			VirtualProtect(dst, S, PAGE_EXECUTE_READWRITE, &currentProtection);
 
-			*(HookLibrary::WORD*)dst = 0xFF25;
+			*(HookLibrary::WORD*)dst = 0x25FF;
 
-			memset((dst + 2), 0x0, (S-2));
+			memset((dst + 2), 0x0, 0x4);
 
 			*(QWORD*)(dst + 0x6) = (QWORD)function;
 			memset((dst + 14), 0x90, (S - 14));
@@ -66,7 +66,7 @@ namespace HookLibrary {
 			return sb;
 		}
 #else
-		template<size_t S>
+		template<DWORD S>
 		SwappedBytes<S> Detour(BYTE* dst, BYTE* function) {
 			if (S < 5) {
 				return SwappedBytes<S>();
@@ -95,7 +95,7 @@ namespace HookLibrary {
 #endif
 
 #ifdef _WIN64
-		template<size_t S>
+		template<DWORD S>
 		SwappedBytes<S> TrampHook(BYTE* src, BYTE* dst) {
 			if (S < 14) {
 				return SwappedBytes<S>();
@@ -114,10 +114,10 @@ namespace HookLibrary {
 			return Detour(src, dst, S);
 		}
 #else
-		template<size_t S>
+		template<DWORD S>
 		SwappedBytes<S> TrampHook(BYTE* src, BYTE* dst) {
 			if (S < 5) {
-				return SwappedBytes<1>();
+				return SwappedBytes<S>();
 			}
 
 			BYTE* gateway = (BYTE*)VirtualAlloc(0, S, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
@@ -134,7 +134,7 @@ namespace HookLibrary {
 		}
 #endif
 
-		template<size_t S>
+		template<DWORD S>
 		SwappedBytes<S> WriteBytes(BYTE* dst, const char* bytes) {
 			SwappedBytes<S> sb(dst);
 
@@ -148,7 +148,7 @@ namespace HookLibrary {
 			return sb;
 		}
 
-		template<size_t S>
+		template<DWORD S>
 		SwappedBytes<S> Nop(BYTE* dst) {
 			SwappedBytes<S> sb(dst);
 			DWORD currentProtection;
