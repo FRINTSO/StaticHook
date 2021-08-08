@@ -30,6 +30,9 @@
     <Filter Include="HookUtils">
       <UniqueIdentifier>{efd8818c-fc62-4c0a-902d-ac8f7fd91e88}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Proc">
+      <UniqueIdentifier>{9003988d-cc8a-4f46-a40a-5e3227f7cf01}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Vector2.h">
@@ -56,6 +59,9 @@
     <ClInclude Include="src\HookUtils.h">
       <Filter>HookUtils</Filter>
     </ClInclude>
+    <ClInclude Include="src\proc.h">
+      <Filter>Proc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Vector2.cpp">
@@ -72,6 +78,9 @@
     </ClCompile>
     <ClCompile Include="src\HookUtils.cpp">
       <Filter>HookUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proc.cpp">
+      <Filter>Proc</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
