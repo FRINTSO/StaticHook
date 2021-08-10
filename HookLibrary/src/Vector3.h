@@ -28,6 +28,9 @@ namespace HookLibrary {
 
 			bool operator==(const Vector3& other) const;
 			bool operator!=(const Vector3& other) const;
+
+			inline float& operator[](size_t index) noexcept;
+			constexpr const float& operator[](size_t index) const noexcept;
 		};
 
 	} // namespace DataStructures

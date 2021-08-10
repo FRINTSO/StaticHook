@@ -76,5 +76,19 @@ namespace HookLibrary {
             return x != other.x || y != other.y;
         }
 
+        inline float& Vector2::operator[](size_t index) noexcept {
+#if _CONTAINER_DEBUG_LEVEL > 0
+            _STL_VERIFY(index < 4, "vector2 subscript out of range");
+#endif
+            return *((float*)(this) + index);
+        }
+
+        constexpr const float& Vector2::operator[](size_t index) const noexcept {
+#if _CONTAINER_DEBUG_LEVEL > 0
+            _STL_VERIFY(index < 4, "vector2 subscript out of range");
+#endif
+            return *((float*)(this) + index);
+        }
+
     } // namespace DataStructures
 } // namespace HookLibrary

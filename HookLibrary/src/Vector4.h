@@ -28,6 +28,10 @@ namespace HookLibrary {
 
 			inline bool operator==(const Vector4& other) const;
 			inline bool operator!=(const Vector4& other) const;
+
+			inline float& operator[](size_t index) noexcept;
+			constexpr const float& operator[](size_t index) const noexcept;
+
 		};
 	}
 }

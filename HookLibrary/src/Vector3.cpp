@@ -80,5 +80,19 @@ namespace HookLibrary {
 			return x != other.x || y != other.y || z != other.z;
 		}
 
+		inline float& Vector3::operator[](size_t index) noexcept {
+#if _CONTAINER_DEBUG_LEVEL > 0
+			_STL_VERIFY(index < 3, "vector3 subscript out of range");
+#endif
+			return *((float*)(this) + index);
+		}
+
+		constexpr const float& Vector3::operator[](size_t index) const noexcept {
+#if _CONTAINER_DEBUG_LEVEL > 0
+			_STL_VERIFY(index < 3, "vector3 subscript out of range");
+#endif
+			return *((float*)(this) + index);
+		}
+
 	} // namespace DataStructures
 } // namespace HookLibrary
