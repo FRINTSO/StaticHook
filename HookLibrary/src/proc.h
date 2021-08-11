@@ -7,33 +7,33 @@
 
 DWORD
 WINAPI
-GetProcIdW(
+GetProcessIdW(
 	_In_ LPCWSTR lpProcessName
 	);
 
 DWORD
 WINAPI
-GetProcIdA(
+GetProcessIdA(
 	_In_ LPCSTR lpProcessName
 	);
 
 #ifdef UNICODE
-#define GetProcId GetProcIdW
+#define GetProcessId GetProcessIdW
 #else
-#define GetProcId GetProcIdA
+#define GetProcessId GetProcessIdA
 #endif // !UNICODE
 
 LPVOID
 WINAPI
 GetModuleBaseAddressW(
-	_In_ DWORD procId,
+	_In_ DWORD dwProcessId,
 	_In_ LPCWSTR lpModuleName
 	);
 
 LPVOID
 WINAPI
 GetModuleBaseAddressA(
-	_In_ DWORD procId,
+	_In_ DWORD dwProcessId,
 	_In_ LPCSTR lpModuleName
 	);
 
@@ -50,22 +50,26 @@ typedef struct _MODULE_NAMEW {
 
 VOID
 WINAPI
-GetModuleNameW(_Out_ LPMODULE_NAMEW lpModuleName);
+GetModuleNameW(
+	_Out_ LPMODULE_NAMEW lpModuleName
+	);
 
 
-typedef struct _MODULE_NAME {
+typedef struct _MODULE_NAMEA {
 	char szModuleName[MAX_PATH];
-} MODULE_NAME, *LPMODULE_NAME;
+} MODULE_NAMEA, *LPMODULE_NAMEA;
 
 VOID
 WINAPI
-GetModuleNameA(_Out_ LPMODULE_NAME lpModuleName);
+GetModuleNameA(
+	_Out_ LPMODULE_NAMEA lpModuleName
+	);
 
 
 #ifdef UNICODE
 #define GetModuleName GetModuleNameW
 #define MODULE_NAME MODULE_NAMEW
-#define LPMODULE_NAME LPMODULENAMEW
+#define LPMODULE_NAME LPMODULE_NAMEW
 #endif // !UNICODE
 
 #endif // !STATICHOOK_PROC_H_
