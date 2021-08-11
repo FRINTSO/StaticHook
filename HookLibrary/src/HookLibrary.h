@@ -8,5 +8,6 @@
 #include "HookUtils.h"
 #include "SwappedBytes.h"
 #include "DataTypes.h"
+#include "proc.h"
 
 #endif // !STATICHOOK_HOOKLIBRARY_H_
