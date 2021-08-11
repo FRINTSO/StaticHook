@@ -155,7 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\proc.h" />
+    <ClInclude Include="src\Proc.h" />
     <ClInclude Include="src\HookUtils.h" />
     <ClInclude Include="src\Hook.h" />
     <ClInclude Include="src\SwappedBytes.h" />

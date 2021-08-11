@@ -59,7 +59,7 @@
     <ClInclude Include="src\HookUtils.h">
       <Filter>HookUtils</Filter>
     </ClInclude>
-    <ClInclude Include="src\proc.h">
+    <ClInclude Include="src\Proc.h">
       <Filter>Proc</Filter>
     </ClInclude>
   </ItemGroup>
