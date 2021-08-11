@@ -1,10 +1,7 @@
 #ifndef STATICHOOK_SWAPPEDBYTES_H_
 #define STATICHOOK_SWAPPEDBYTES_H_
 
-#include <Windows.h>
-
 #include "DataTypes.h"
-#include "HookUtils.h"
 
 namespace HookLibrary {
 	namespace HookUtils {
