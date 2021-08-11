@@ -19,6 +19,9 @@ namespace HookLibrary {
 		bool Detour32(BYTE* src, BYTE* dst, const DWORD length);
 		BYTE* TrampHook32(BYTE* src, BYTE* dst, const DWORD length);
 
+			BYTE* HookAllocator();
+
+		} // namespace Memory
 	} // namespace HookUtils
 } // namespace HookLibrary
 

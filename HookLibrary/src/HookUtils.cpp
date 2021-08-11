@@ -1,5 +1,7 @@
 #include "HookUtils.h"
 
+#include "proc.h"
+
 namespace HookLibrary  {
 	namespace HookUtils  {
 
@@ -77,5 +79,32 @@ namespace HookLibrary  {
 		}
 
 
+			BYTE* HookAllocator() {
+
+				/*
+				Information about making an allocation:
+				Follow Cheat Engines standard to begin with.
+				Allocate below entry for targeted module
+
+				*/
+				
+				HMODULE hExe = GetModuleHandle(NULL);
+				wchar_t fullPath[MAX_PATH]{ 0 };
+				wchar_t fname[MAX_PATH] = { 0 };
+				wchar_t ext[MAX_PATH] = { 0 };
+				wchar_t procName[MAX_PATH] = { 0 };
+				GetModuleFileName(hExe, fullPath, MAX_PATH);
+				_wsplitpath(fullPath, 0, 0, fname, ext);
+				wcscpy(procName, fname);
+				wcscat(procName, ext);
+
+				//GetProcId(L"")
+
+				//VirtualAllocEx()
+
+				return 0;
+			}
+
+		} // namespace Memory
 	} // namespace HookUtils
 } // namespace HookLibrary

@@ -23,6 +23,8 @@ namespace HookLibrary {
 	typedef float				FP32;
 	typedef double				FP64;
 
+
+	typedef wchar_t				WCHAR;
 } // namespace HookLibrary
 
 #endif // !STATICHOOK_DATATYPES_H_
