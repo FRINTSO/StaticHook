@@ -16,11 +16,17 @@ namespace HookLibrary {
 
 		Hook::Hook(const char* exportName, const char* moduleName, BYTE* dst, BYTE* PtrToGatewayFnPtr, DWORD length) {
 			HMODULE hModule = GetModuleHandleA(moduleName);
-
-			this->src = (BYTE*)GetProcAddress(hModule, exportName);
-			this->dst = dst;
-			this->length = length;
-			this->PtrToGatewayFnPtr = PtrToGatewayFnPtr;
+			if (hModule != 0) {
+				this->src = (BYTE*)GetProcAddress(hModule, exportName);
+				this->dst = dst;
+				this->length = length;
+				this->PtrToGatewayFnPtr = PtrToGatewayFnPtr;
+			} else {
+				this->src = nullptr;
+				this->dst = nullptr;
+				this->length = 0;
+				this->PtrToGatewayFnPtr = nullptr;
+			}
 		}
 
 		void Hook::Enable() {

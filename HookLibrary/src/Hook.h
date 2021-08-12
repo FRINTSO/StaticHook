@@ -8,14 +8,13 @@ namespace HookLibrary {
 
 
 		struct Hook {
-			bool bStatus{ false };
+			BYTE* src{ nullptr }; // 0x8
+			BYTE* dst{ nullptr }; // 0x8
+			BYTE* PtrToGatewayFnPtr{ nullptr }; //0x8
+			DWORD length{ 0 }; //0x4
 
-			BYTE* src{ nullptr };
-			BYTE* dst{ nullptr };
-			BYTE* PtrToGatewayFnPtr{ nullptr };
-			DWORD length{ 0 };
-
-			BYTE originalBytes[10]{ 0 };
+			bool bStatus{ false }; //0x1
+			BYTE originalBytes[11]{ 0 }; //0xB
 
 			Hook(BYTE* src, BYTE* dst, BYTE* PtrToGatewayFnPtr, DWORD length);
 			Hook(const char* exportName, const char* moduleName, BYTE* dst, BYTE* PtrToGatewayFnPtr, DWORD length);

@@ -2,8 +2,8 @@
 
 #include "proc.h"
 
-namespace HookLibrary  {
-	namespace HookUtils  {
+namespace HookLibrary {
+	namespace HookUtils {
 		namespace Memory {
 
 			void Patch(BYTE* dst, BYTE* src, DWORD size) {
@@ -52,7 +52,7 @@ namespace HookLibrary  {
 				DWORD currentProtection;
 				VirtualProtect(src, length, PAGE_EXECUTE_READWRITE, &currentProtection);
 
-				uintptr_t relativeAddress = dst - src - 5;
+				uintptr_t relativeAddress = (uintptr_t)(dst - src) - 5;
 
 				*src = 0xE9;
 				*(uintptr_t*)(src + 1) = relativeAddress;
@@ -68,7 +68,7 @@ namespace HookLibrary  {
 
 				memcpy_s(gateway, length, src, length);
 
-				uintptr_t gatewayRelativeAddress = src - gateway - 5;
+				uintptr_t gatewayRelativeAddress = (uintptr_t)(src - gateway) - 5;
 
 				*(gateway + length) = 0xE9;
 
@@ -80,21 +80,21 @@ namespace HookLibrary  {
 			}
 
 
-				BYTE* HookAllocator() {
+			BYTE* HookAllocator() {
 
-					/*
-					Information about making an allocation:
-					Follow Cheat Engines standard to begin with.
-					Allocate below entry for targeted module
+				/*
+				Information about making an allocation:
+				Follow Cheat Engines standard to begin with.
+				Allocate below entry for targeted module
 
-					*/
+				*/
 
-					//GetProcId(L"")
+				//GetProcId(L"")
 
-					//VirtualAllocEx()
+				//VirtualAllocEx()
 
-					return 0;
-				}
+				return 0;
+			}
 
 		} // namespace Memory
 	} // namespace HookUtils
