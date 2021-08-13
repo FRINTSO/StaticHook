@@ -64,6 +64,7 @@ GetModuleBaseAddressW(_In_ DWORD dwProcessId, _In_ LPCWSTR lpModuleName) {
 			do {
 				if (_wcsicmp(moduleEntry.szModule, lpModuleName)) {
 					moduleBaseAddress = (LPVOID)moduleEntry.modBaseAddr;
+					break;
 				}
 			} while (Module32NextW(hSnap, &moduleEntry));
 		}
@@ -84,6 +85,7 @@ GetModuleBaseAddressA(_In_ DWORD dwProcessId, _In_ LPCSTR lpModuleName) {
 			do {
 				if (_stricmp(moduleEntry.szModule, lpModuleName)) {
 					moduleBaseAddress = (LPVOID)moduleEntry.modBaseAddr;
+					break;
 				}
 			} while (Module32Next(hSnap, &moduleEntry));
 		}
