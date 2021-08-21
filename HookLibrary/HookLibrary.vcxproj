@@ -155,6 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\ModuleJumpTable.h" />
     <ClInclude Include="src\Proc.h" />
     <ClInclude Include="src\HookUtils.h" />
     <ClInclude Include="src\Hook.h" />
@@ -166,6 +167,7 @@
     <ClInclude Include="src\Vector4.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ModuleJumpTable.cpp" />
     <ClCompile Include="src\Proc.cpp" />
     <ClCompile Include="src\HookUtils.cpp" />
     <ClCompile Include="src\Hook.cpp" />
