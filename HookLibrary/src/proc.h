@@ -3,6 +3,14 @@
 
 #include <Windows.h>
 
+#ifdef UNICODE
+#undef UNICODE
+#include <TlHelp32.h>
+#define UNICODE
+#else
+#include <TlHelp32.h>
+#endif // !UNICODE
+
 #include <cstdint>
 
 DWORD
@@ -71,5 +79,29 @@ GetModuleNameA(
 #define MODULE_NAME MODULE_NAMEW
 #define LPMODULE_NAME LPMODULE_NAMEW
 #endif // !UNICODE
+
+VOID
+WINAPI
+GetModuleEntryW(
+	_In_ DWORD dwProcessId,
+	_In_ LPCWSTR lpModuleName,
+	_Out_ LPMODULEENTRY32W lpme
+	);
+
+
+VOID
+WINAPI
+GetModuleEntryA(
+	_In_ DWORD dwProcessId,
+	_In_ LPCSTR lpModuleName,
+	_Out_ LPMODULEENTRY32 lpme
+	);
+
+#ifdef UNICODE
+#define GetModuleEntry GetModuleEntryW
+#else
+#define GetModuleEntry GetModuleEntryA
+#endif // UNICODE
+
 
 #endif // !STATICHOOK_PROC_H_

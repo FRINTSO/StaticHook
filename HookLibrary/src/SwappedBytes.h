@@ -22,7 +22,10 @@ namespace HookLibrary {
 				Memory::Patch(src, originalBytes, S);
 			}
 
+#ifdef _WIN64
 			template<DWORD S1> friend SwappedBytes<S1> Detour(BYTE* dst, BYTE* function);
+#endif
+			template<DWORD S1> friend SwappedBytes<S1> Detour32(BYTE* dst, BYTE* function);
 			template<DWORD S1> friend SwappedBytes<S1> TrampHook(BYTE* src, BYTE* dst);
 			template<DWORD S1> friend SwappedBytes<S1> WriteBytes(BYTE* dst, const char* bytes);
 			template<DWORD S1> friend SwappedBytes<S1> Nop(BYTE* dst);
@@ -62,9 +65,9 @@ namespace HookLibrary {
 
 			return sb;
 		}
-#else
+#endif
 		template<DWORD S>
-		SwappedBytes<S> Detour(BYTE* dst, BYTE* function) {
+		SwappedBytes<S> Detour32(BYTE* dst, BYTE* function) {
 			if (S < 5) {
 				return SwappedBytes<S>();
 			}
@@ -89,7 +92,6 @@ namespace HookLibrary {
 
 			return sb;
 		}
-#endif
 
 #ifdef _WIN64
 		template<DWORD S>
