@@ -89,7 +89,7 @@ GetModuleBaseAddressA(_In_ DWORD dwProcessId, _In_ LPCSTR lpModuleName) {
 
 LPVOID
 WINAPI
-GetModuleBaseOfAddress(_In_ DWORD dwProcessId, _In_ LPVOID lpAddress) {
+GetBaseOfAddress(_In_ DWORD dwProcessId, _In_ LPVOID lpAddress) {
 	LPVOID moduleBaseAddress = 0;
 	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, dwProcessId);
 	if (hSnap != INVALID_HANDLE_VALUE) {

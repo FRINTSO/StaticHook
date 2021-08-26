@@ -54,7 +54,7 @@ GetModuleBaseAddressA(
 
 LPVOID
 WINAPI
-GetModuleBaseOfAddress(
+GetBaseOfAddress(
 	_In_ DWORD dwProcessId,
 	_In_ LPVOID lpAddress
 	);
