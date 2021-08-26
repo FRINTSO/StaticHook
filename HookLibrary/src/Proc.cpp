@@ -118,3 +118,76 @@ GetModuleNameA(_Out_ LPMODULE_NAMEA lpModuleName) {
 	strcpy(lpModuleName->szModuleName, fname);
 	strcat(lpModuleName->szModuleName, ext);
 }
+}
+
+VOID
+WINAPI
+GetModuleByBaseAddressW(_In_ DWORD dwProcessId, _In_ LPVOID lpModuleBaseAddress, _Out_ LPMODULE_NAMEW lpModuleName) {
+	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, dwProcessId);
+	if (hSnap != INVALID_HANDLE_VALUE) {
+		MODULEENTRY32W moduleEntry;
+		moduleEntry.dwSize = sizeof(moduleEntry);
+		if (Module32FirstW(hSnap, &moduleEntry)) {
+			do {
+				if (moduleEntry.modBaseAddr == lpModuleBaseAddress) {
+					wcscpy(lpModuleName->szModuleName, moduleEntry.szModule);
+					break;
+				}
+			} while (Module32NextW(hSnap, &moduleEntry));
+		}
+	}
+	CloseHandle(hSnap);
+}
+
+VOID
+WINAPI
+GetModuleByBaseAddressA(_In_ DWORD dwProcessId, _In_ LPVOID lpModuleBaseAddress, _Out_ LPMODULE_NAMEA lpModuleName) {
+	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, dwProcessId);
+	if (hSnap != INVALID_HANDLE_VALUE) {
+		MODULEENTRY32 moduleEntry;
+		moduleEntry.dwSize = sizeof(moduleEntry);
+		if (Module32First(hSnap, &moduleEntry)) {
+			do {
+				if (moduleEntry.modBaseAddr == lpModuleBaseAddress) {
+					strcpy(lpModuleName->szModuleName, moduleEntry.szModule);
+					break;
+				}
+			} while (Module32Next(hSnap, &moduleEntry));
+		}
+	}
+	CloseHandle(hSnap);
+}
+
+VOID
+WINAPI
+GetModuleEntryW( _In_ DWORD dwProcessId, _In_ LPCWSTR lpModuleName, _Out_ LPMODULEENTRY32W lpme) {
+	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, dwProcessId);
+	if (hSnap != INVALID_HANDLE_VALUE) {
+		lpme->dwSize = sizeof(*lpme);
+		if (Module32FirstW(hSnap, lpme)) {
+			do {
+				if (!_wcsicmp(lpme->szModule, lpModuleName)) {
+					break;
+				}
+			} while (Module32NextW(hSnap, lpme));
+		}
+	}
+	CloseHandle(hSnap);
+}
+
+VOID
+WINAPI
+GetModuleEntryA(_In_ DWORD dwProcessId, _In_ LPCSTR lpModuleName, _Out_ LPMODULEENTRY32 lpme) {
+	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, dwProcessId);
+	if (hSnap != INVALID_HANDLE_VALUE) {
+		lpme->dwSize = sizeof(*lpme);
+		if (Module32First(hSnap, lpme)) {
+			do {
+				if (!_stricmp(lpme->szModule, lpModuleName)) {
+					break;
+				}
+			} while (Module32Next(hSnap, lpme));
+		}
+	}
+	CloseHandle(hSnap);
+}

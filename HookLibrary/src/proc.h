@@ -44,6 +44,15 @@ GetModuleBaseAddressA(
 #endif // !UNICODE
 
 
+LPVOID
+WINAPI
+GetModuleBaseOfAddress(
+	_In_ DWORD dwProcessId,
+	_In_ LPVOID lpAddress
+	);
+
+
+
 typedef struct _MODULE_NAMEW {
 	WCHAR szModuleName[MAX_PATH];
 } MODULE_NAMEW, *LPMODULE_NAMEW;
@@ -71,5 +80,49 @@ GetModuleNameA(
 #define MODULE_NAME MODULE_NAMEW
 #define LPMODULE_NAME LPMODULE_NAMEW
 #endif // !UNICODE
+
+VOID
+WINAPI
+GetModuleByBaseAddressW(
+	_In_ DWORD dwProcessId,
+	_In_ LPVOID lpModuleBaseAddress,
+	_Out_ LPMODULE_NAMEW lpModuleName
+	);
+
+VOID
+WINAPI
+GetModuleByBaseAddressA(
+	_In_ DWORD dwProcessId,
+	_In_ LPVOID lpModuleBaseAddress,
+	_Out_ LPMODULE_NAMEA lpModuleName
+	);
+
+#ifdef UNICODE
+#define GetModuleByBaseAddress GetModuleByBaseAddressW
+#endif // !UNICODE
+
+VOID
+WINAPI
+GetModuleEntryW(
+	_In_ DWORD dwProcessId,
+	_In_ LPCWSTR lpModuleName,
+	_Out_ LPMODULEENTRY32W lpme
+	);
+
+
+VOID
+WINAPI
+GetModuleEntryA(
+	_In_ DWORD dwProcessId,
+	_In_ LPCSTR lpModuleName,
+	_Out_ LPMODULEENTRY32 lpme
+	);
+
+#ifdef UNICODE
+#define GetModuleEntry GetModuleEntryW
+#else
+#define GetModuleEntry GetModuleEntryA
+#endif // UNICODE
+
 
 #endif // !STATICHOOK_PROC_H_
