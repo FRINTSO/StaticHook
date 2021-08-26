@@ -52,6 +52,15 @@ GetModuleBaseAddressA(
 #endif // !UNICODE
 
 
+LPVOID
+WINAPI
+GetModuleBaseOfAddress(
+	_In_ DWORD dwProcessId,
+	_In_ LPVOID lpAddress
+	);
+
+
+
 typedef struct _MODULE_NAMEW {
 	WCHAR szModuleName[MAX_PATH];
 } MODULE_NAMEW, *LPMODULE_NAMEW;
@@ -78,6 +87,26 @@ GetModuleNameA(
 #define GetModuleName GetModuleNameW
 #define MODULE_NAME MODULE_NAMEW
 #define LPMODULE_NAME LPMODULE_NAMEW
+#endif // !UNICODE
+
+VOID
+WINAPI
+GetModuleByBaseAddressW(
+	_In_ DWORD dwProcessId,
+	_In_ LPVOID lpModuleBaseAddress,
+	_Out_ LPMODULE_NAMEW lpModuleName
+	);
+
+VOID
+WINAPI
+GetModuleByBaseAddressA(
+	_In_ DWORD dwProcessId,
+	_In_ LPVOID lpModuleBaseAddress,
+	_Out_ LPMODULE_NAMEA lpModuleName
+	);
+
+#ifdef UNICODE
+#define GetModuleByBaseAddress GetModuleByBaseAddressW
 #endif // !UNICODE
 
 VOID

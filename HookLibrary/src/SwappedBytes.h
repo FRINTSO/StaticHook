@@ -2,6 +2,7 @@
 #define STATICHOOK_SWAPPEDBYTES_H_
 
 #include "DataTypes.h"
+#include "HookUtils.h"
 
 namespace HookLibrary {
 	namespace HookUtils {
