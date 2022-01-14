@@ -79,23 +79,6 @@ namespace HookLibrary  {
 				return gateway;
 			}
 
-
-				BYTE* HookAllocator() {
-
-					/*
-					Information about making an allocation:
-					Follow Cheat Engines standard to begin with.
-					Allocate below entry for targeted module
-
-					*/
-
-					//GetProcId(L"")
-
-					//VirtualAllocEx()
-
-					return 0;
-				}
-
 		} // namespace Memory
 	} // namespace HookUtils
 } // namespace HookLibrary

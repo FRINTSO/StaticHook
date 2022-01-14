@@ -3,6 +3,14 @@
 
 #include <Windows.h>
 
+#ifdef UNICODE
+#undef UNICODE
+#include <TlHelp32.h>
+#define UNICODE
+#else
+#include <TlHelp32.h>
+#endif // !UNICODE
+
 #include <cstdint>
 
 DWORD
@@ -46,7 +54,7 @@ GetModuleBaseAddressA(
 
 LPVOID
 WINAPI
-GetModuleBaseOfAddress(
+GetBaseOfAddress(
 	_In_ DWORD dwProcessId,
 	_In_ LPVOID lpAddress
 	);

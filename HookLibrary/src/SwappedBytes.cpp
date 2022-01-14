@@ -1,0 +1,124 @@
+#include "SwappedBytes.h"
+
+#include "proc.h"
+#include "ModuleJumpTable.h"
+
+namespace HookLibrary {
+	namespace HookUtils {
+
+		SwappedBytes::SwappedBytes(SwappedBytes&& other) noexcept
+			: src(other.src), originalBytes(other.originalBytes), bytesSize(other.bytesSize), lpFunction(other.lpFunction) {
+			other.src = NULL;
+			other.originalBytes = nullptr;
+			other.bytesSize = NULL;
+			other.lpFunction = NULL;
+		}
+
+		SwappedBytes::~SwappedBytes() {
+			this->Restore();
+			src = NULL;
+			delete[] originalBytes;
+			originalBytes = nullptr;
+			bytesSize = NULL;
+			lpFunction = NULL;
+		}
+
+		bool SwappedBytes::operator==(const SwappedBytes& other) {
+			return src == other.src && lpFunction == other.lpFunction && bytesSize == other.bytesSize && memcmp(originalBytes, other.originalBytes, bytesSize);
+		}
+
+		void SwappedBytes::Restore() {
+			if (!this->src) return; // Source or target function is empty
+
+			HookLibrary::HookUtils::Memory::Patch((BYTE*)this->src, (BYTE*)this->originalBytes, this->bytesSize);
+			// find jump table that hold the swapped bytes object
+
+			DWORD dwProcessId = GetCurrentProcessId();
+			ULONG64 baseAddress = (ULONG64)GetBaseOfAddress(dwProcessId, (LPVOID)this->src);
+
+			if (baseAddress == NULL) {
+				throw "Base address of swappedbytes injection was NULL";
+			}
+
+			Memory::ModuleJumpTable::jumpTables[baseAddress].UnregisterSwappedBytes(this);
+
+			this->src = NULL;
+			delete[] this->originalBytes;
+			this->originalBytes = nullptr;
+			this->bytesSize = NULL;
+			this->lpFunction = nullptr;
+		}
+
+		SwappedBytes Detour32(BYTE* dst, LPVOID lpFunction, size_t size) {
+			if (size < 5) throw "Size of bytes to be replaced with a jump-instruction must be atleast 5";
+
+			Memory::ModuleJumpTable* jumpTable = Memory::ModuleJumpTable::FetchModuleJumpTable(dst);
+
+			if (!jumpTable) {
+				return SwappedBytes();
+			}
+
+			SwappedBytes swappedBytes = SwappedBytes((PULONG_PTR)dst, lpFunction);
+			LPVOID jumpTableAddress = jumpTable->RegisterSwappedBytes(&swappedBytes);
+
+			if (!jumpTableAddress) {
+				return SwappedBytes();
+			}
+
+			// Write hook
+			DWORD currentProtection;
+
+			VirtualProtect(dst, size, PAGE_EXECUTE_READWRITE, &currentProtection);
+
+			DWORD relativeAddress = (uintptr_t)jumpTableAddress - (uintptr_t)dst - 5;
+
+			*dst = 0xE9;
+
+			*(DWORD*)(dst + 1) = relativeAddress;
+
+			for (DWORD x = 0x5; x < size; x++)
+				*(dst + x) = 0x90;
+
+			VirtualProtect(dst, size, currentProtection, &currentProtection);
+
+			return swappedBytes;
+		}
+
+		SwappedBytes Nop(BYTE* dst, size_t size) {
+			SwappedBytes swappedBytes(dst, size);
+			DWORD currentProtection;
+
+			VirtualProtect(dst, size, PAGE_EXECUTE_READWRITE, &currentProtection);
+
+			memset(dst, 0x90, size);
+			VirtualProtect(dst, size, currentProtection, &currentProtection);
+
+			return swappedBytes;
+		}
+
+		SwappedBytes WriteBytes(BYTE* dst, LPCSTR pattern, size_t size) {
+			SwappedBytes swappedBytes(dst, size);
+			DWORD currentProtection;
+
+			VirtualProtect(dst, size, PAGE_EXECUTE_READWRITE, &currentProtection);
+
+			memcpy(dst, pattern, size);
+			VirtualProtect(dst, size, currentProtection, &currentProtection);
+
+			return swappedBytes;
+		}
+
+		SwappedBytes::SwappedBytes(BYTE * src, size_t bytes)
+			: src((ULONG64)src), bytesSize(bytes), lpFunction(nullptr) {
+			originalBytes = new BYTE[bytes];
+			memcpy(originalBytes, src, bytes);
+		}
+
+		SwappedBytes::SwappedBytes(PULONG_PTR src, void* function)
+			: src((ULONG64)src), bytesSize(sizeof(AbsoluteFarJmp)), lpFunction(function) {
+			originalBytes = new BYTE[sizeof(AbsoluteFarJmp)];
+			memcpy(originalBytes, src, sizeof(AbsoluteFarJmp));
+		}
+
+	} // namespace HookUtils
+} // namespace HookLibrary

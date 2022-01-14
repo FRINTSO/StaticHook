@@ -33,6 +33,9 @@
     <Filter Include="Proc">
       <UniqueIdentifier>{9003988d-cc8a-4f46-a40a-5e3227f7cf01}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ModuleJumpTable">
+      <UniqueIdentifier>{425463ed-6d07-44e6-a6c4-bea7838478f0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Vector2.h">
@@ -62,6 +65,12 @@
     <ClInclude Include="src\Proc.h">
       <Filter>Proc</Filter>
     </ClInclude>
+    <ClInclude Include="src\ModuleJumpTable.h">
+      <Filter>ModuleJumpTable</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AbsoluteFarJmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Vector2.cpp">
@@ -81,6 +90,12 @@
     </ClCompile>
     <ClCompile Include="src\Proc.cpp">
       <Filter>Proc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModuleJumpTable.cpp">
+      <Filter>ModuleJumpTable</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SwappedBytes.cpp">
+      <Filter>SwappedBytes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
