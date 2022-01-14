@@ -17,27 +17,27 @@ namespace HookLibrary {
 
 			void Restore();
 
-			friend SwappedBytes Detour32(BYTE* dst, LPVOID lpFunction, size_t size);
-			friend SwappedBytes Nop(BYTE* dst, size_t size);
-			friend SwappedBytes WriteBytes(BYTE* dst, LPCSTR pattern, size_t size);
+			friend SwappedBytes Detour32(BYTE* dst, PVOID lpFunction, SIZE_T size);
+			friend SwappedBytes Nop(BYTE* dst, SIZE_T size);
+			friend SwappedBytes WriteBytes(BYTE* dst, PCSTR pattern, SIZE_T size);
 		private:
 			SwappedBytes() = default;
-			SwappedBytes(BYTE* src, size_t bytes);
-			SwappedBytes(PULONG_PTR src, void* function);
+			SwappedBytes(BYTE* src, SIZE_T bytes);
+			SwappedBytes(PULONG_PTR src, PVOID function);
 			SwappedBytes(const SwappedBytes&) = delete;
 
 		public:
 			friend class ModuleJumpTable;
 
-			ULONG64 src;
+			ULONG_PTR src;
 			BYTE* originalBytes;
-			size_t bytesSize;
-			LPVOID lpFunction;
+			SIZE_T bytesSize;
+			PVOID lpFunction;
 		};
-
-		SwappedBytes Detour32(BYTE* dst, LPVOID lpFunction, size_t size);
-		SwappedBytes Nop(BYTE* dst, size_t size);
-		SwappedBytes WriteBytes(BYTE* dst, LPCSTR pattern, size_t size);
+		
+		SwappedBytes Detour32(BYTE* dst, PVOID lpFunction, SIZE_T size);
+		SwappedBytes Nop(BYTE* dst, SIZE_T size);
+		SwappedBytes WriteBytes(BYTE* dst, PCSTR pattern, SIZE_T size);
 
 	} // namespace HookUtils
 } // namespace HookLibrary

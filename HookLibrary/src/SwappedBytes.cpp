@@ -34,7 +34,7 @@ namespace HookLibrary {
 			// find jump table that hold the swapped bytes object
 
 			DWORD dwProcessId = GetCurrentProcessId();
-			ULONG64 baseAddress = (ULONG64)GetBaseOfAddress(dwProcessId, (LPVOID)this->src);
+			ULONG_PTR baseAddress = (ULONG_PTR)GetBaseOfAddress(dwProcessId, (PVOID)this->src);
 
 			if (baseAddress == NULL) {
 				throw "Base address of swappedbytes injection was NULL";
@@ -49,7 +49,7 @@ namespace HookLibrary {
 			this->lpFunction = nullptr;
 		}
 
-		SwappedBytes Detour32(BYTE* dst, LPVOID lpFunction, size_t size) {
+		SwappedBytes Detour32(BYTE* dst, LPVOID lpFunction, SIZE_T size) {
 			if (size < 5) throw "Size of bytes to be replaced with a jump-instruction must be atleast 5";
 
 			Memory::ModuleJumpTable* jumpTable = Memory::ModuleJumpTable::FetchModuleJumpTable(dst);
@@ -57,9 +57,9 @@ namespace HookLibrary {
 			if (!jumpTable) {
 				return SwappedBytes();
 			}
-
+			
 			SwappedBytes swappedBytes = SwappedBytes((PULONG_PTR)dst, lpFunction);
-			LPVOID jumpTableAddress = jumpTable->RegisterSwappedBytes(&swappedBytes);
+			PVOID jumpTableAddress = jumpTable->RegisterSwappedBytes(&swappedBytes);
 
 			if (!jumpTableAddress) {
 				return SwappedBytes();
@@ -69,12 +69,12 @@ namespace HookLibrary {
 			DWORD currentProtection;
 
 			VirtualProtect(dst, size, PAGE_EXECUTE_READWRITE, &currentProtection);
-
-			DWORD relativeAddress = (uintptr_t)jumpTableAddress - (uintptr_t)dst - 5;
+			
+			ULONG_PTR relativeAddress = (ULONG_PTR)jumpTableAddress - (ULONG_PTR)dst - 5;
 
 			*dst = 0xE9;
 
-			*(DWORD*)(dst + 1) = relativeAddress;
+			*(ULONG_PTR*)(dst + 1) = relativeAddress;
 
 			for (DWORD x = 0x5; x < size; x++)
 				*(dst + x) = 0x90;
@@ -84,7 +84,7 @@ namespace HookLibrary {
 			return swappedBytes;
 		}
 
-		SwappedBytes Nop(BYTE* dst, size_t size) {
+		SwappedBytes Nop(BYTE* dst, SIZE_T size) {
 			SwappedBytes swappedBytes(dst, size);
 			DWORD currentProtection;
 
@@ -96,7 +96,7 @@ namespace HookLibrary {
 			return swappedBytes;
 		}
 
-		SwappedBytes WriteBytes(BYTE* dst, LPCSTR pattern, size_t size) {
+		SwappedBytes WriteBytes(BYTE* dst, LPCSTR pattern, SIZE_T size) {
 			SwappedBytes swappedBytes(dst, size);
 			DWORD currentProtection;
 
@@ -108,14 +108,14 @@ namespace HookLibrary {
 			return swappedBytes;
 		}
 
-		SwappedBytes::SwappedBytes(BYTE * src, size_t bytes)
-			: src((ULONG64)src), bytesSize(bytes), lpFunction(nullptr) {
+		SwappedBytes::SwappedBytes(BYTE* src, SIZE_T bytes)
+			: src((ULONG_PTR)src), bytesSize(bytes), lpFunction(nullptr) {
 			originalBytes = new BYTE[bytes];
 			memcpy(originalBytes, src, bytes);
 		}
 
-		SwappedBytes::SwappedBytes(PULONG_PTR src, void* function)
-			: src((ULONG64)src), bytesSize(sizeof(AbsoluteFarJmp)), lpFunction(function) {
+		SwappedBytes::SwappedBytes(PULONG_PTR src, PVOID function)
+			: src((ULONG_PTR)src), bytesSize(sizeof(AbsoluteFarJmp)), lpFunction(function) {
 			originalBytes = new BYTE[sizeof(AbsoluteFarJmp)];
 			memcpy(originalBytes, src, sizeof(AbsoluteFarJmp));
 		}

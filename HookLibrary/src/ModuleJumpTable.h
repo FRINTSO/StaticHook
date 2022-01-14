@@ -25,7 +25,6 @@ namespace HookLibrary {
 	namespace HookUtils {
 		namespace Memory {
 
-
 			class ModuleJumpTable {
 			public:
 				ModuleJumpTable();
@@ -38,7 +37,7 @@ namespace HookLibrary {
 
 				ModuleJumpTable& operator=(const ModuleJumpTable& rhs);
 
-				ModuleJumpTable(ULONG64 baseAddress);
+				ModuleJumpTable(ULONG_PTR baseAddress);
 
 				static ModuleJumpTable* FetchModuleJumpTable(BYTE* dst) {
 					DWORD dwProcessId = GetCurrentProcessId();
@@ -72,32 +71,32 @@ namespace HookLibrary {
 					}
 				}
 
-				static std::unordered_map<ULONG64, ModuleJumpTable> jumpTables;
+				static std::unordered_map<ULONG_PTR, ModuleJumpTable> jumpTables;
 
-				LPVOID RegisterSwappedBytes(SwappedBytes* swappedBytes);
+				PVOID RegisterSwappedBytes(SwappedBytes* swappedBytes);
 
 				VOID UnregisterSwappedBytes(SwappedBytes* swappedBytes);
 
 			private:
 
-				void ReallocateJumpTable(size_t newCapacity);
+				VOID ReallocateJumpTable(SIZE_T newCapacity);
 
-				BOOL AllocateJumpTable(size_t size);
+				BOOL AllocateJumpTable(SIZE_T size);
 
-				VOID DeallocateJumpTable(ULONG64 address);
+				VOID DeallocateJumpTable(ULONG_PTR address);
 
-				VOID ReallocateJumps(size_t newCapacity);
+				VOID ReallocateJumps(SIZE_T newCapacity);
 
 				friend class SwappedBytes;
 
-				ULONG64 baseAddress = NULL;
-				ULONG baseSize = 0;
-				ULONG64 allocationBase = NULL;
-				ULONG allocationSize = 0;
+				ULONG_PTR baseAddress = NULL;
+				SIZE_T baseSize = 0;
+				ULONG_PTR allocationBase = NULL;
+				SIZE_T allocationSize = 0;
 
 				AbsoluteFarJmp* jumps = nullptr;
-				size_t jumpsSize = 0;
-				size_t jumpsCapacity = 0;
+				SIZE_T jumpsSize = 0;
+				SIZE_T jumpsCapacity = 0;
 			};
 
 		} // namespace Memory

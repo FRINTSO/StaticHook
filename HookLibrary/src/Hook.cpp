@@ -7,15 +7,19 @@
 namespace HookLibrary {
 	namespace HookUtils {
 
-		Hook::Hook(BYTE* src, BYTE* dst, BYTE* PtrToGatewayFnPtr, DWORD length) {
+		Hook::Hook(BYTE* src, BYTE* dst, BYTE* PtrToGatewayFnPtr, SIZE_T length) {
 			this->src = src;
 			this->dst = dst;
 			this->length = length;
 			this->PtrToGatewayFnPtr = PtrToGatewayFnPtr;
 		}
 
-		Hook::Hook(const char* exportName, const char* moduleName, BYTE* dst, BYTE* PtrToGatewayFnPtr, DWORD length) {
+		Hook::Hook(PCSTR exportName, PCSTR moduleName, BYTE* dst, BYTE* PtrToGatewayFnPtr, SIZE_T length) {
 			HMODULE hModule = GetModuleHandleA(moduleName);
+			
+			if (hModule == 0) {
+				throw "module name could not be found";
+			}
 
 			this->src = (BYTE*)GetProcAddress(hModule, exportName);
 			this->dst = dst;

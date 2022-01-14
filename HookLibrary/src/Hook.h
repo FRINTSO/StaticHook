@@ -1,6 +1,8 @@
 #ifndef STATICHOOK_HOOK_H_
 #define STATICHOOK_HOOK_H_
 
+#include <Windows.h>
+
 #include "DataTypes.h"
 
 namespace HookLibrary {
@@ -13,12 +15,12 @@ namespace HookLibrary {
 			BYTE* src{ nullptr };
 			BYTE* dst{ nullptr };
 			BYTE* PtrToGatewayFnPtr{ nullptr };
-			DWORD length{ 0 };
+			SIZE_T length{ 0 };
 
 			BYTE originalBytes[10]{ 0 };
 
-			Hook(BYTE* src, BYTE* dst, BYTE* PtrToGatewayFnPtr, DWORD length);
-			Hook(const char* exportName, const char* moduleName, BYTE* dst, BYTE* PtrToGatewayFnPtr, DWORD length);
+			Hook(BYTE* src, BYTE* dst, BYTE* PtrToGatewayFnPtr, SIZE_T length);
+			Hook(PCSTR exportName, PCSTR moduleName, BYTE* dst, BYTE* PtrToGatewayFnPtr, SIZE_T length);
 
 			void Enable();
 			void Disable();

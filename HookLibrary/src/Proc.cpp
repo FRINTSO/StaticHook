@@ -2,16 +2,16 @@
 
 DWORD
 WINAPI
-GetProcessIdW(_In_ LPCWSTR lpProcessName) {
+GetProcessIdW(_In_ PCWSTR pszProcessName) {
 	DWORD procId = 0;
 	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (hSnap != INVALID_HANDLE_VALUE) {
-		PROCESSENTRY32W procEntry;
+		PROCESSENTRY32W procEntry{ 0 };
 		procEntry.dwSize = sizeof(procEntry);
 
 		if (Process32FirstW(hSnap, &procEntry)) {
 			do {
-				if (!_wcsicmp(procEntry.szExeFile, lpProcessName)) {
+				if (!_wcsicmp(procEntry.szExeFile, pszProcessName)) {
 					procId = procEntry.th32ProcessID;
 					break;
 				}
@@ -24,16 +24,16 @@ GetProcessIdW(_In_ LPCWSTR lpProcessName) {
 
 DWORD
 WINAPI
-GetProcessIdA(_In_ LPCSTR lpProcessName) {
+GetProcessIdA(_In_ PCSTR pszProcessName) {
 	DWORD procId = 0;
 	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (hSnap != INVALID_HANDLE_VALUE) {
-		PROCESSENTRY32 procEntry;
+		PROCESSENTRY32 procEntry{ 0 };
 		procEntry.dwSize = sizeof(procEntry);
 
 		if (Process32First(hSnap, &procEntry)) {
 			do {
-				if (!_stricmp(procEntry.szExeFile, lpProcessName)) {
+				if (!_stricmp(procEntry.szExeFile, pszProcessName)) {
 					procId = procEntry.th32ProcessID;
 					break;
 				}
@@ -44,18 +44,18 @@ GetProcessIdA(_In_ LPCSTR lpProcessName) {
 	return procId;
 }
 
-LPVOID
+PVOID
 WINAPI
-GetModuleBaseAddressW(_In_ DWORD dwProcessId, _In_ LPCWSTR lpModuleName) {
-	LPVOID moduleBaseAddress = 0;
+GetModuleBaseAddressW(_In_ DWORD dwProcessId, _In_ PCWSTR pszModuleName) {
+	PVOID moduleBaseAddress = 0;
 	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, dwProcessId);
 	if (hSnap != INVALID_HANDLE_VALUE) {
-		MODULEENTRY32W moduleEntry;
+		MODULEENTRY32W moduleEntry{ 0 };
 		moduleEntry.dwSize = sizeof(moduleEntry);
 		if (Module32FirstW(hSnap, &moduleEntry)) {
 			do {
-				if (!_wcsicmp(moduleEntry.szModule, lpModuleName)) {
-					moduleBaseAddress = (LPVOID)moduleEntry.modBaseAddr;
+				if (!_wcsicmp(moduleEntry.szModule, pszModuleName)) {
+					moduleBaseAddress = (PVOID)moduleEntry.modBaseAddr;
 					break;
 				}
 			} while (Module32NextW(hSnap, &moduleEntry));
@@ -65,18 +65,18 @@ GetModuleBaseAddressW(_In_ DWORD dwProcessId, _In_ LPCWSTR lpModuleName) {
 	return moduleBaseAddress;
 }
 
-LPVOID
+PVOID
 WINAPI
-GetModuleBaseAddressA(_In_ DWORD dwProcessId, _In_ LPCSTR lpModuleName) {
-	LPVOID moduleBaseAddress = 0;
+GetModuleBaseAddressA(_In_ DWORD dwProcessId, _In_ PCSTR pszModuleName) {
+	PVOID moduleBaseAddress = NULL;
 	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, dwProcessId);
 	if (hSnap != INVALID_HANDLE_VALUE) {
-		MODULEENTRY32 moduleEntry;
+		MODULEENTRY32 moduleEntry{ 0 };
 		moduleEntry.dwSize = sizeof(moduleEntry);
 		if (Module32First(hSnap, &moduleEntry)) {
 			do {
-				if (!_stricmp(moduleEntry.szModule, lpModuleName)) {
-					moduleBaseAddress = (LPVOID)moduleEntry.modBaseAddr;
+				if (!_stricmp(moduleEntry.szModule, pszModuleName)) {
+					moduleBaseAddress = (PVOID)moduleEntry.modBaseAddr;
 					break;
 				}
 			} while (Module32Next(hSnap, &moduleEntry));
@@ -87,19 +87,19 @@ GetModuleBaseAddressA(_In_ DWORD dwProcessId, _In_ LPCSTR lpModuleName) {
 }
 
 
-LPVOID
+PVOID
 WINAPI
-GetBaseOfAddress(_In_ DWORD dwProcessId, _In_ LPVOID lpAddress) {
-	LPVOID moduleBaseAddress = 0;
+GetBaseOfAddress(_In_ DWORD dwProcessId, _In_ PVOID pAddress) {
+	PVOID moduleBaseAddress = 0;
 	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, dwProcessId);
 	if (hSnap != INVALID_HANDLE_VALUE) {
-		MODULEENTRY32W moduleEntry;
+		MODULEENTRY32W moduleEntry{ 0 };
 		moduleEntry.dwSize = sizeof(moduleEntry);
 		if (Module32FirstW(hSnap, &moduleEntry)) {
 			do
 			{
-				if (lpAddress >= moduleEntry.modBaseAddr && lpAddress < moduleEntry.modBaseAddr + moduleEntry.modBaseSize) {
-					moduleBaseAddress = moduleEntry.modBaseAddr;
+				if (pAddress >= moduleEntry.modBaseAddr && pAddress < moduleEntry.modBaseAddr + moduleEntry.modBaseSize) {
+					moduleBaseAddress = (PVOID)moduleEntry.modBaseAddr;
 					break;
 				}
 			} while (Module32NextW(hSnap, &moduleEntry));
@@ -112,41 +112,41 @@ GetBaseOfAddress(_In_ DWORD dwProcessId, _In_ LPVOID lpAddress) {
 
 VOID
 WINAPI
-GetModuleNameW(_Out_ LPMODULE_NAMEW lpModuleName) {
+GetModuleNameW(_Out_ PMODULE_NAMEW pModuleName) {
 	HMODULE hExe = GetModuleHandleW(NULL);
 	wchar_t fullPath[MAX_PATH]{ 0 };
-	wchar_t fname[MAX_PATH] = { 0 };
-	wchar_t ext[MAX_PATH] = { 0 };
+	wchar_t fname[MAX_PATH]{ 0 };
+	wchar_t ext[MAX_PATH]{ 0 };
 	GetModuleFileNameW(hExe, fullPath, MAX_PATH);
 	_wsplitpath(fullPath, 0, 0, fname, ext);
-	wcscpy(lpModuleName->szModuleName, fname);
-	wcscat(lpModuleName->szModuleName, ext);
+	wcscpy(pModuleName->szModuleName, fname);
+	wcscat(pModuleName->szModuleName, ext);
 }
 
 VOID
 WINAPI
-GetModuleNameA(_Out_ LPMODULE_NAMEA lpModuleName) {
+GetModuleNameA(_Out_ PMODULE_NAMEA pModuleName) {
 	HMODULE hExe = GetModuleHandleA(NULL);
 	char fullPath[MAX_PATH]{ 0 };
-	char fname[MAX_PATH] = { 0 };
-	char ext[MAX_PATH] = { 0 };
+	char fname[MAX_PATH]{ 0 };
+	char ext[MAX_PATH]{ 0 };
 	GetModuleFileNameA(hExe, fullPath, MAX_PATH);
 	_splitpath(fullPath, 0, 0, fname, ext);
-	strcpy(lpModuleName->szModuleName, fname);
-	strcat(lpModuleName->szModuleName, ext);
+	strcpy(pModuleName->szModuleName, fname);
+	strcat(pModuleName->szModuleName, ext);
 }
 
 VOID
 WINAPI
-GetModuleByBaseAddressW(_In_ DWORD dwProcessId, _In_ LPVOID lpModuleBaseAddress, _Out_ LPMODULE_NAMEW lpModuleName) {
+GetModuleByBaseAddressW(_In_ DWORD dwProcessId, _In_ PVOID pModuleBaseAddress, _Out_ PMODULE_NAMEW pModuleName) {
 	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, dwProcessId);
 	if (hSnap != INVALID_HANDLE_VALUE) {
-		MODULEENTRY32W moduleEntry;
+		MODULEENTRY32W moduleEntry{ 0 };
 		moduleEntry.dwSize = sizeof(moduleEntry);
 		if (Module32FirstW(hSnap, &moduleEntry)) {
 			do {
-				if (moduleEntry.modBaseAddr == lpModuleBaseAddress) {
-					wcscpy(lpModuleName->szModuleName, moduleEntry.szModule);
+				if (moduleEntry.modBaseAddr == pModuleBaseAddress) {
+					wcscpy(pModuleName->szModuleName, moduleEntry.szModule);
 					break;
 				}
 			} while (Module32NextW(hSnap, &moduleEntry));
@@ -157,15 +157,15 @@ GetModuleByBaseAddressW(_In_ DWORD dwProcessId, _In_ LPVOID lpModuleBaseAddress,
 
 VOID
 WINAPI
-GetModuleByBaseAddressA(_In_ DWORD dwProcessId, _In_ LPVOID lpModuleBaseAddress, _Out_ LPMODULE_NAMEA lpModuleName) {
+GetModuleByBaseAddressA(_In_ DWORD dwProcessId, _In_ PVOID pModuleBaseAddress, _Out_ PMODULE_NAMEA pModuleName) {
 	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, dwProcessId);
 	if (hSnap != INVALID_HANDLE_VALUE) {
-		MODULEENTRY32 moduleEntry;
+		MODULEENTRY32 moduleEntry{ 0 };
 		moduleEntry.dwSize = sizeof(moduleEntry);
 		if (Module32First(hSnap, &moduleEntry)) {
 			do {
-				if (moduleEntry.modBaseAddr == lpModuleBaseAddress) {
-					strcpy(lpModuleName->szModuleName, moduleEntry.szModule);
+				if (moduleEntry.modBaseAddr == pModuleBaseAddress) {
+					strcpy(pModuleName->szModuleName, moduleEntry.szModule);
 					break;
 				}
 			} while (Module32Next(hSnap, &moduleEntry));
@@ -176,16 +176,16 @@ GetModuleByBaseAddressA(_In_ DWORD dwProcessId, _In_ LPVOID lpModuleBaseAddress,
 
 VOID
 WINAPI
-GetModuleEntryW( _In_ DWORD dwProcessId, _In_ LPCWSTR lpModuleName, _Out_ LPMODULEENTRY32W lpme) {
+GetModuleEntryW(_In_ DWORD dwProcessId, _In_ PCWSTR pszModuleName, _Out_ PMODULEENTRY32W pme) {
 	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, dwProcessId);
 	if (hSnap != INVALID_HANDLE_VALUE) {
-		lpme->dwSize = sizeof(*lpme);
-		if (Module32FirstW(hSnap, lpme)) {
+		pme->dwSize = sizeof(*pme);
+		if (Module32FirstW(hSnap, pme)) {
 			do {
-				if (!_wcsicmp(lpme->szModule, lpModuleName)) {
+				if (!_wcsicmp(pme->szModule, pszModuleName)) {
 					break;
 				}
-			} while (Module32NextW(hSnap, lpme));
+			} while (Module32NextW(hSnap, pme));
 		}
 	}
 	CloseHandle(hSnap);
@@ -193,16 +193,16 @@ GetModuleEntryW( _In_ DWORD dwProcessId, _In_ LPCWSTR lpModuleName, _Out_ LPMODU
 
 VOID
 WINAPI
-GetModuleEntryA(_In_ DWORD dwProcessId, _In_ LPCSTR lpModuleName, _Out_ LPMODULEENTRY32 lpme) {
+GetModuleEntryA(_In_ DWORD dwProcessId, _In_ PCSTR pszModuleName, _Out_ PMODULEENTRY32 pme) {
 	HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, dwProcessId);
 	if (hSnap != INVALID_HANDLE_VALUE) {
-		lpme->dwSize = sizeof(*lpme);
-		if (Module32First(hSnap, lpme)) {
+		pme->dwSize = sizeof(*pme);
+		if (Module32First(hSnap, pme)) {
 			do {
-				if (!_stricmp(lpme->szModule, lpModuleName)) {
+				if (!_stricmp(pme->szModule, pszModuleName)) {
 					break;
 				}
-			} while (Module32Next(hSnap, lpme));
+			} while (Module32Next(hSnap, pme));
 		}
 	}
 	CloseHandle(hSnap);

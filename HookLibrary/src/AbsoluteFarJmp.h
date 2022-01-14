@@ -1,7 +1,7 @@
 #ifndef ABSOLUTE_FAR_JMP_H_
 #define ABSOLUTE_FAR_JMP_H_
 
-#include <Windows.h>
+// TODO: Add namespace
 
 struct AbsoluteFarJmp {
 	BYTE opcode[2]{ 0xFF, 0x25 };
@@ -9,7 +9,7 @@ struct AbsoluteFarJmp {
 	BYTE absoluteMemoryAddress[8]{ 0x0, 0x0, 0x0, 0x0,0x0, 0x0, 0x0, 0x0 };
 
 	AbsoluteFarJmp() = default;
-	AbsoluteFarJmp(void* memoryAddress) {
+	AbsoluteFarJmp(PVOID memoryAddress) {
 		memcpy(absoluteMemoryAddress, &memoryAddress, 0x8);
 	}
 }; // size: 0x14

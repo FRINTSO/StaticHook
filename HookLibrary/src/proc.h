@@ -16,13 +16,13 @@
 DWORD
 WINAPI
 GetProcessIdW(
-	_In_ LPCWSTR lpProcessName
+	_In_ PCWSTR pszProcessName
 	);
 
 DWORD
 WINAPI
 GetProcessIdA(
-	_In_ LPCSTR lpProcessName
+	_In_ PCSTR pszProcessName
 	);
 
 #ifdef UNICODE
@@ -31,18 +31,18 @@ GetProcessIdA(
 #define GetProcessId GetProcessIdA
 #endif // !UNICODE
 
-LPVOID
+PVOID
 WINAPI
 GetModuleBaseAddressW(
 	_In_ DWORD dwProcessId,
-	_In_ LPCWSTR lpModuleName
+	_In_ PCWSTR pszModuleName
 	);
 
-LPVOID
+PVOID
 WINAPI
 GetModuleBaseAddressA(
 	_In_ DWORD dwProcessId,
-	_In_ LPCSTR lpModuleName
+	_In_ PCSTR pszModuleName
 	);
 
 #ifdef UNICODE
@@ -52,57 +52,57 @@ GetModuleBaseAddressA(
 #endif // !UNICODE
 
 
-LPVOID
+PVOID
 WINAPI
 GetBaseOfAddress(
 	_In_ DWORD dwProcessId,
-	_In_ LPVOID lpAddress
+	_In_ PVOID lpAddress
 	);
 
 
 
 typedef struct _MODULE_NAMEW {
 	WCHAR szModuleName[MAX_PATH];
-} MODULE_NAMEW, *LPMODULE_NAMEW;
+} MODULE_NAMEW, *PMODULE_NAMEW;
 
 VOID
 WINAPI
 GetModuleNameW(
-	_Out_ LPMODULE_NAMEW lpModuleName
+	_Out_ PMODULE_NAMEW pModuleName
 	);
 
 
 typedef struct _MODULE_NAMEA {
 	char szModuleName[MAX_PATH];
-} MODULE_NAMEA, *LPMODULE_NAMEA;
+} MODULE_NAMEA, *PMODULE_NAMEA;
 
 VOID
 WINAPI
 GetModuleNameA(
-	_Out_ LPMODULE_NAMEA lpModuleName
+	_Out_ PMODULE_NAMEA pModuleName
 	);
 
 
 #ifdef UNICODE
 #define GetModuleName GetModuleNameW
 #define MODULE_NAME MODULE_NAMEW
-#define LPMODULE_NAME LPMODULE_NAMEW
+#define PMODULE_NAME PMODULE_NAMEW
 #endif // !UNICODE
 
 VOID
 WINAPI
 GetModuleByBaseAddressW(
 	_In_ DWORD dwProcessId,
-	_In_ LPVOID lpModuleBaseAddress,
-	_Out_ LPMODULE_NAMEW lpModuleName
+	_In_ PVOID pModuleBaseAddress,
+	_Out_ PMODULE_NAMEW pModuleName
 	);
 
 VOID
 WINAPI
 GetModuleByBaseAddressA(
 	_In_ DWORD dwProcessId,
-	_In_ LPVOID lpModuleBaseAddress,
-	_Out_ LPMODULE_NAMEA lpModuleName
+	_In_ PVOID pModuleBaseAddress,
+	_Out_ PMODULE_NAMEA pModuleName
 	);
 
 #ifdef UNICODE
@@ -113,8 +113,8 @@ VOID
 WINAPI
 GetModuleEntryW(
 	_In_ DWORD dwProcessId,
-	_In_ LPCWSTR lpModuleName,
-	_Out_ LPMODULEENTRY32W lpme
+	_In_ PCWSTR pszModuleName,
+	_Out_ PMODULEENTRY32W pme
 	);
 
 
@@ -122,8 +122,8 @@ VOID
 WINAPI
 GetModuleEntryA(
 	_In_ DWORD dwProcessId,
-	_In_ LPCSTR lpModuleName,
-	_Out_ LPMODULEENTRY32 lpme
+	_In_ PCSTR pszModuleName,
+	_Out_ PMODULEENTRY32 pme
 	);
 
 #ifdef UNICODE

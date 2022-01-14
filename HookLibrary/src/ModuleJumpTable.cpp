@@ -1,12 +1,11 @@
 #include "ModuleJumpTable.h"
 
-
 #include "SwappedBytes.h"
 
 namespace HookLibrary {
 	namespace HookUtils {
 		namespace Memory {
-
+			
 			ModuleJumpTable::ModuleJumpTable()
 				: baseAddress(NULL), baseSize(0), allocationBase(NULL), allocationSize(0), jumps(nullptr), jumpsSize(0), jumpsCapacity(0)
 			{}
@@ -56,8 +55,8 @@ namespace HookLibrary {
 				jumpsCapacity = rhs.jumpsCapacity;
 				return *this;
 			}
-
-			ModuleJumpTable::ModuleJumpTable(ULONG64 baseAddress)
+			
+			ModuleJumpTable::ModuleJumpTable(ULONG_PTR baseAddress)
 				: baseAddress(baseAddress) {
 
 				DWORD peHeader = *(DWORD*)(baseAddress + 0x3C);
@@ -69,9 +68,9 @@ namespace HookLibrary {
 				ReallocateJumpTable(10);
 			}
 
-			LPVOID ModuleJumpTable::RegisterSwappedBytes(SwappedBytes* swappedBytes) {
-				for (size_t i = 0; i < jumpsSize; i++) {
-					if (*(ULONG64*)jumps[i].absoluteMemoryAddress == (ULONG64)swappedBytes->lpFunction) {
+			PVOID ModuleJumpTable::RegisterSwappedBytes(SwappedBytes* swappedBytes) {
+				for (SIZE_T i = 0; i < jumpsSize; i++) {
+					if (*(ULONG_PTR*)jumps[i].absoluteMemoryAddress == (ULONG_PTR)swappedBytes->lpFunction) {
 						throw "Multiple hooks can't target the same function";
 					}
 				}
@@ -84,40 +83,37 @@ namespace HookLibrary {
 					throw "Jumptable has reached full capacity, cannot allocate more jumps";
 				}
 
-
 				// store SwappedBytes Object
-
 				// Update memory block with new jump
-
 
 				jumps[jumpsSize] = std::move(swappedBytes->lpFunction);
 				this->jumpsSize++;
 
-				LPVOID jumpAddress = (LPVOID)(allocationBase + (jumpsSize - 1) * sizeof(AbsoluteFarJmp));
+				PVOID jumpAddress = (PVOID)(allocationBase + (jumpsSize - 1) * sizeof(AbsoluteFarJmp));
 
-				memcpy(jumpAddress, (LPVOID)&jumps[jumpsSize - 1], sizeof(AbsoluteFarJmp));
+				memcpy(jumpAddress, (PVOID)&jumps[jumpsSize - 1], sizeof(AbsoluteFarJmp));
 
 				return jumpAddress;
 			}
 
 			VOID ModuleJumpTable::UnregisterSwappedBytes(SwappedBytes* swappedBytes) {
-				for (size_t i = 0; i < jumpsSize; i++) {
-					auto farJump = jumps[i];
-					LPVOID functionAddress = *(LPVOID*)farJump.absoluteMemoryAddress;
-					if (functionAddress == (LPVOID)swappedBytes->lpFunction) {
+				for (SIZE_T i = 0; i < jumpsSize; i++) {
+					AbsoluteFarJmp farJump = jumps[i];
+					PVOID functionAddress = *(PVOID*)farJump.absoluteMemoryAddress;
+					if (functionAddress == (PVOID)swappedBytes->lpFunction) {
 
-						auto remainingSize = (jumpsSize - (i + 1)) * sizeof(AbsoluteFarJmp);
+						SIZE_T remainingSize = (jumpsSize - (i + 1)) * sizeof(AbsoluteFarJmp);
 
 						if (remainingSize != 0) {
-							auto returned = memcpy((LPVOID)(allocationBase + sizeof(AbsoluteFarJmp) * i), (LPVOID)(allocationBase + sizeof(AbsoluteFarJmp) * (i + 1)), remainingSize);
+							memcpy((PVOID)(allocationBase + sizeof(AbsoluteFarJmp) * i), (PVOID)(allocationBase + sizeof(AbsoluteFarJmp) * (i + 1)), remainingSize);
 						}
 
 						jumpsSize--;
 
-						memset((LPVOID)(allocationBase + jumpsSize * sizeof(AbsoluteFarJmp)), 0x0, sizeof(AbsoluteFarJmp));
+						memset((PVOID)(allocationBase + jumpsSize * sizeof(AbsoluteFarJmp)), 0x0, sizeof(AbsoluteFarJmp));
 
 						// remove entry from 
-						memcpy((LPVOID)&jumps[i], (LPVOID)&jumps[i + 1], ((jumpsSize + 1) - (i + 1)) * sizeof(AbsoluteFarJmp));
+						memcpy((PVOID)&jumps[i], (PVOID)&jumps[i + 1], ((jumpsSize + 1) - (i + 1)) * sizeof(AbsoluteFarJmp));
 
 						jumps[jumpsSize] = AbsoluteFarJmp();
 
@@ -128,17 +124,16 @@ namespace HookLibrary {
 				}
 			}
 
-			std::unordered_map<ULONG64, ModuleJumpTable> ModuleJumpTable::jumpTables = std::unordered_map<ULONG64, ModuleJumpTable>();
+			std::unordered_map<ULONG_PTR, ModuleJumpTable> ModuleJumpTable::jumpTables = std::unordered_map<ULONG_PTR, ModuleJumpTable>();
 
-			void ModuleJumpTable::ReallocateJumpTable(size_t newCapacity) {
+			VOID ModuleJumpTable::ReallocateJumpTable(SIZE_T newCapacity) {
 				// newCapacity: capacity of amount jumps
 				// capacity doesn't referer to bytes allocated
 				// bytes allocated is stored in allocationSize
 				// capacity of 1 jump is 14 bytes, due to a jump being 14 bytes
 				// floor capacity to nearest common divisor of 14
-				//
 
-				size_t sizeOfJumps = newCapacity * sizeof(AbsoluteFarJmp); // the size of an absolute jump is 14 bytes
+				SIZE_T sizeOfJumps = newCapacity * sizeof(AbsoluteFarJmp); // the size of an absolute jump is 14 bytes
 
 				if (newCapacity == 0) {
 
@@ -158,16 +153,18 @@ namespace HookLibrary {
 				}
 			}
 
-			BOOL ModuleJumpTable::AllocateJumpTable(size_t size) {
+			BOOL ModuleJumpTable::AllocateJumpTable(SIZE_T size) {
+				// TODO: Refactor method and add a private findAllocationBase method which finds the allocation base, which also uses the highestAllocationBase
+
 				DWORD dwProcessId = GetCurrentProcessId();
 				HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwProcessId);
 
-				unsigned long long lowestAllocationBase = baseAddress + baseSize + INT32_MIN;
-				unsigned long long highestAllocationBase = (baseAddress + INT32_MAX + 5) - size;
+				ULONG_PTR lowestAllocationBase = baseAddress + baseSize + INT32_MIN;
+				// ULONG_PTR highestAllocationBase = (baseAddress + INT32_MAX + 5) - size;
 
-				MEMORY_BASIC_INFORMATION memInfo;
+				MEMORY_BASIC_INFORMATION memInfo{ 0 };
 
-				unsigned long long selectedAllocationAddress = baseAddress;
+				ULONG_PTR selectedAllocationAddress = baseAddress;
 
 				// find allocation base
 				do {
@@ -186,38 +183,38 @@ namespace HookLibrary {
 
 				hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId);
 
-				LPVOID lpAllocatedAddress = VirtualAllocEx(hProcess, (LPVOID)selectedAllocationAddress, size, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-
+				PVOID pAllocatedAddress = VirtualAllocEx(hProcess, (PVOID)selectedAllocationAddress, size, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+				
 				CloseHandle(hProcess);
 
-				if (lpAllocatedAddress == NULL) {
+				if (pAllocatedAddress == NULL) {
 					allocationSize = 0;
 					return FALSE;
 				}
-				allocationBase = (ULONG64)lpAllocatedAddress;
+				allocationBase = (ULONG_PTR)pAllocatedAddress;
 
 				allocationSize = ((size + 0xFFF) / 0x1000) * 0x1000;
 
 				return TRUE;
 			}
 
-			VOID ModuleJumpTable::DeallocateJumpTable(ULONG64 address) {
+			VOID ModuleJumpTable::DeallocateJumpTable(ULONG_PTR address) {
 				DWORD dwProcessId = GetCurrentProcessId();
 				HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwProcessId);
-				BOOL bSuccess = VirtualFreeEx(hProcess, (LPVOID)address, 0, MEM_RELEASE);
+				BOOL bSuccess = VirtualFreeEx(hProcess, (PVOID)address, 0, MEM_RELEASE);
 
 				if (!bSuccess) throw "Jumptable deallocation failed";
 
 				CloseHandle(hProcess);
 			}
 
-			VOID ModuleJumpTable::ReallocateJumps(size_t newCapacity) {
+			VOID ModuleJumpTable::ReallocateJumps(SIZE_T newCapacity) {
 				AbsoluteFarJmp* buffer = new AbsoluteFarJmp[newCapacity];
 
 				if (newCapacity < jumpsSize)
 					jumpsSize = newCapacity;
 
-				for (size_t i = 0; i < jumpsSize; i++)
+				for (SIZE_T i = 0; i < jumpsSize; i++)
 					buffer[i] = std::move(jumps[i]);
 
 
