@@ -98,7 +98,7 @@ GetBaseOfAddress(_In_ DWORD dwProcessId, _In_ LPVOID lpAddress) {
 		if (Module32FirstW(hSnap, &moduleEntry)) {
 			do
 			{
-				if (lpAddress > moduleEntry.modBaseAddr && lpAddress < moduleEntry.modBaseAddr + moduleEntry.modBaseSize) {
+				if (lpAddress >= moduleEntry.modBaseAddr && lpAddress < moduleEntry.modBaseAddr + moduleEntry.modBaseSize) {
 					moduleBaseAddress = moduleEntry.modBaseAddr;
 					break;
 				}

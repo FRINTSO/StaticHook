@@ -68,6 +68,9 @@
     <ClInclude Include="src\ModuleJumpTable.h">
       <Filter>ModuleJumpTable</Filter>
     </ClInclude>
+    <ClInclude Include="src\AbsoluteFarJmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Vector2.cpp">
@@ -90,6 +93,9 @@
     </ClCompile>
     <ClCompile Include="src\ModuleJumpTable.cpp">
       <Filter>ModuleJumpTable</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SwappedBytes.cpp">
+      <Filter>SwappedBytes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

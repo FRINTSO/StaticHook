@@ -9,144 +9,95 @@
 // SwappedBytes object gets returned
 // If the user wants to restore the SwappedBytes object, then the jump table removes the hook's entry in the jump table
 
-// 
-
 
 #ifndef STATICHOOK_MODULEJUMPTABLE_H_
 #define STATICHOOK_MODULEJUMPTABLE_H_
 
 #include <Windows.h>
 
+#include <unordered_map>
+
 #include "proc.h"
+#include "AbsoluteFarJmp.h"
 #include "SwappedBytes.h"
 
 namespace HookLibrary {
 	namespace HookUtils {
 		namespace Memory {
 
-			struct AbsoluteFarJmp {
-				BYTE opcode[2]{ 0xFF, 0x25 };
-				BYTE absoluteAddressSpecifier[4]{ 0x0, 0x0, 0x0, 0x0 };
-				BYTE absoluteMemoryAddress[8]{ 0x0, 0x0, 0x0, 0x0,0x0, 0x0, 0x0, 0x0 };
 
-				AbsoluteFarJmp() = default;
-				AbsoluteFarJmp(void* memoryAddress) {
-					memcpy(absoluteMemoryAddress, &memoryAddress, 0x8);
-				}
-			}; // size: 0x14
-
-			template<unsigned long HookCount>
 			class ModuleJumpTable {
 			public:
-				ModuleJumpTable(const wchar_t* moduleName, const AbsoluteFarJmp(&initializer)[HookCount])
-					: moduleName(moduleName) {
+				ModuleJumpTable();
 
-					// store hooks
-					for (size_t i = 0; i < HookCount; i++) {
-						jumps[i] = initializer[i];
+				~ModuleJumpTable();
+
+				ModuleJumpTable(const ModuleJumpTable& other) = delete;
+
+				ModuleJumpTable(ModuleJumpTable&& other) noexcept;
+
+				ModuleJumpTable& operator=(const ModuleJumpTable& rhs);
+
+				ModuleJumpTable(ULONG64 baseAddress);
+
+				static ModuleJumpTable* FetchModuleJumpTable(BYTE* dst) {
+					DWORD dwProcessId = GetCurrentProcessId();
+
+					ULONG64 baseAddress = (ULONG64)GetBaseOfAddress(dwProcessId, (LPVOID)dst);
+
+					if (baseAddress == NULL) {
+						HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, false, dwProcessId);
+
+						MEMORY_BASIC_INFORMATION memInfo;
+
+						VirtualQueryEx(hProcess, dst, &memInfo, sizeof(memInfo));
+
+						CloseHandle(hProcess);
+
+						throw "Base address was null";
 					}
+					else {
+						std::unordered_map<ULONG64, ModuleJumpTable>::iterator got = ModuleJumpTable::jumpTables.find(baseAddress);
 
-					// Get module base address
-					DWORD dwProcessId = GetProcessIdW(moduleName);
+						ModuleJumpTable* jumpTable = nullptr;
 
-					MODULEENTRY32W moduleEntry = { 0 };
-					GetModuleEntryW(dwProcessId, moduleName, &moduleEntry);
-
-					moduleBaseAddress = (unsigned long long)moduleEntry.modBaseAddr;
-					moduleSize = (unsigned long)moduleEntry.modBaseSize;
-
-
-					// Minimum allocation size is 1000 bytes
-
-					unsigned long jumpsSize = 0x1000;
-					while (sizeof(jumps) > jumpsSize) jumpsSize += 0x1000;
-					allocationSize = jumpsSize;
-
-					bool success = TryInject(dwProcessId);
-
-					if (success) {
-						memcpy((void*)allocationBase, (void*)jumps, HookCount * 14);
-					}
-
-					// Look for good allocation base
-
-					// When found 
-				}
-
-				template<DWORD S>
-				void Register(SwappedBytes<S> swappedBytes) {
-					// Store swappedbytes object in linked list
-				}
-
-				void Deallocate() {
-					// Store all memory addresses in the module that have been hooked
-					// along with their original bytes
-
-					// One hook can't be called from different addresses, due to jump-back-address
-
-
-
-					// Deallocate all placed hooks
-
-					// Make sure all hooks are restored to their original bytes befor deallocating hook-jump-table
-
-					DWORD dwProcessId = GetProcessIdW(moduleName);
-
-					HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, dwProcessId);
-
-					VirtualFreeEx(hProcess, (LPVOID)allocationBase, 0, MEM_RELEASE);
-
-					CloseHandle(hProcess);
-				}
-
-				unsigned long long GetJumpTableAddressFromFunction(void* function) {
-					int index = -1;
-					for (size_t i = 0; i < HookCount; i++) {
-						if (*(unsigned long long*)jumps[i].absoluteMemoryAddress == (unsigned long long)function) {
-							index = (int)i;
-							break;
+						if (got == ModuleJumpTable::jumpTables.end()) { // create new jumptable
+							jumpTable = &ModuleJumpTable::jumpTables.emplace(baseAddress, ModuleJumpTable(baseAddress)).first->second;
 						}
+						else {
+							jumpTable = &got->second;
+						}
+
+						return jumpTable;
 					}
-
-					if (index == -1) return 0;
-
-					return allocationBase + 14 * (size_t)index;
 				}
 
-				const wchar_t* moduleName;
-				unsigned long long moduleBaseAddress;
-				unsigned long moduleSize;
-				unsigned long long allocationBase;
-				unsigned long allocationSize;
+				static std::unordered_map<ULONG64, ModuleJumpTable> jumpTables;
 
-				AbsoluteFarJmp jumps[HookCount];
+				LPVOID RegisterSwappedBytes(SwappedBytes* swappedBytes);
+
+				VOID UnregisterSwappedBytes(SwappedBytes* swappedBytes);
+
 			private:
-				bool TryInject(DWORD dwProcessId) {
-					HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, false, dwProcessId);
-					unsigned long long selectedAllocationBase = moduleBaseAddress;
-					MEMORY_BASIC_INFORMATION memInfo;
 
-					// Last Possible Jump in module
-					unsigned long long lowestAllocationBase = moduleBaseAddress + moduleSize - 0x80000000;
+				void ReallocateJumpTable(size_t newCapacity);
 
-					do {
-						selectedAllocationBase -= 0x10000;
-						if (lowestAllocationBase > selectedAllocationBase) return false;
+				BOOL AllocateJumpTable(size_t size);
 
-						VirtualQueryEx(hProcess, (LPCVOID)selectedAllocationBase, &memInfo, sizeof(memInfo));
+				VOID DeallocateJumpTable(ULONG64 address);
 
-					} while (!(memInfo.State == 0x10000 && memInfo.RegionSize >= sizeof(jumps)));
+				VOID ReallocateJumps(size_t newCapacity);
 
-					CloseHandle(hProcess);
+				friend class SwappedBytes;
 
-					hProcess = OpenProcess(PROCESS_ALL_ACCESS, false, dwProcessId);
+				ULONG64 baseAddress = NULL;
+				ULONG baseSize = 0;
+				ULONG64 allocationBase = NULL;
+				ULONG allocationSize = 0;
 
-					allocationBase = (unsigned long long)VirtualAllocEx(hProcess, (LPVOID)selectedAllocationBase, sizeof(jumps), MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-
-					CloseHandle(hProcess);
-
-					return true;
-				}
+				AbsoluteFarJmp* jumps = nullptr;
+				size_t jumpsSize = 0;
+				size_t jumpsCapacity = 0;
 			};
 
 		} // namespace Memory
