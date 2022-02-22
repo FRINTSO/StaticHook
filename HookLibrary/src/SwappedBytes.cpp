@@ -34,7 +34,7 @@ namespace HookLibrary {
 			// find jump table that hold the swapped bytes object
 
 			DWORD dwProcessId = GetCurrentProcessId();
-			ULONG_PTR baseAddress = (ULONG_PTR)GetBaseOfAddress(dwProcessId, (PVOID)this->src);
+			ULONG_PTR baseAddress = (ULONG_PTR)GetModuleBaseOfAddress(dwProcessId, (PVOID)this->src);
 
 			if (baseAddress == NULL) {
 				throw "Base address of swappedbytes injection was NULL";

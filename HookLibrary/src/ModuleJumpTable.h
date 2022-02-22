@@ -42,7 +42,7 @@ namespace HookLibrary {
 				static ModuleJumpTable* FetchModuleJumpTable(BYTE* dst) {
 					DWORD dwProcessId = GetCurrentProcessId();
 
-					ULONG64 baseAddress = (ULONG64)GetBaseOfAddress(dwProcessId, (LPVOID)dst);
+					ULONG_PTR baseAddress = (ULONG_PTR)GetModuleBaseOfAddress(dwProcessId, (LPVOID)dst);
 
 					if (baseAddress == NULL) {
 						HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, false, dwProcessId);
@@ -56,7 +56,7 @@ namespace HookLibrary {
 						throw "Base address was null";
 					}
 					else {
-						std::unordered_map<ULONG64, ModuleJumpTable>::iterator got = ModuleJumpTable::jumpTables.find(baseAddress);
+						std::unordered_map<ULONG_PTR, ModuleJumpTable>::iterator got = ModuleJumpTable::jumpTables.find(baseAddress);
 
 						ModuleJumpTable* jumpTable = nullptr;
 

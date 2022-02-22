@@ -33,33 +33,10 @@ GetProcessIdA(
 
 PVOID
 WINAPI
-GetModuleBaseAddressW(
-	_In_ DWORD dwProcessId,
-	_In_ PCWSTR pszModuleName
-	);
-
-PVOID
-WINAPI
-GetModuleBaseAddressA(
-	_In_ DWORD dwProcessId,
-	_In_ PCSTR pszModuleName
-	);
-
-#ifdef UNICODE
-#define GetModuleBaseAddress GetModuleBaseAddressW
-#else
-#define GetModuleBaseAddress GetModuleBaseAddressA
-#endif // !UNICODE
-
-
-PVOID
-WINAPI
-GetBaseOfAddress(
+GetModuleBaseOfAddress(
 	_In_ DWORD dwProcessId,
 	_In_ PVOID lpAddress
 	);
-
-
 
 typedef struct _MODULE_NAMEW {
 	WCHAR szModuleName[MAX_PATH];
@@ -68,6 +45,7 @@ typedef struct _MODULE_NAMEW {
 VOID
 WINAPI
 GetModuleNameW(
+	_In_opt_ HMODULE hModule,
 	_Out_ PMODULE_NAMEW pModuleName
 	);
 
@@ -79,6 +57,7 @@ typedef struct _MODULE_NAMEA {
 VOID
 WINAPI
 GetModuleNameA(
+	_In_opt_ HMODULE hModule,
 	_Out_ PMODULE_NAMEA pModuleName
 	);
 
@@ -91,38 +70,17 @@ GetModuleNameA(
 
 VOID
 WINAPI
-GetModuleByBaseAddressW(
-	_In_ DWORD dwProcessId,
-	_In_ PVOID pModuleBaseAddress,
-	_Out_ PMODULE_NAMEW pModuleName
-	);
-
-VOID
-WINAPI
-GetModuleByBaseAddressA(
-	_In_ DWORD dwProcessId,
-	_In_ PVOID pModuleBaseAddress,
-	_Out_ PMODULE_NAMEA pModuleName
-	);
-
-#ifdef UNICODE
-#define GetModuleByBaseAddress GetModuleByBaseAddressW
-#endif // !UNICODE
-
-VOID
-WINAPI
 GetModuleEntryW(
 	_In_ DWORD dwProcessId,
-	_In_ PCWSTR pszModuleName,
+	_In_ HMODULE hModule,
 	_Out_ PMODULEENTRY32W pme
 	);
-
 
 VOID
 WINAPI
 GetModuleEntryA(
 	_In_ DWORD dwProcessId,
-	_In_ PCSTR pszModuleName,
+	_In_ HMODULE hModule,
 	_Out_ PMODULEENTRY32 pme
 	);
 
