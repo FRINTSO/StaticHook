@@ -31,6 +31,10 @@ namespace HookLibrary {
 			if (!this->src) return; // Source or target function is empty
 
 			HookLibrary::HookUtils::Memory::Patch((BYTE*)this->src, (BYTE*)this->originalBytes, this->bytesSize);
+
+			// Only detour32 can assign lpfunction, meaning if it is null this swappedbytes object was not a detour
+			if (this->lpFunction == nullptr) return;
+
 			// find jump table that hold the swapped bytes object
 
 			DWORD dwProcessId = GetCurrentProcessId();
@@ -40,7 +44,10 @@ namespace HookLibrary {
 				throw "Base address of swappedbytes injection was NULL";
 			}
 
-			Memory::ModuleJumpTable::jumpTables[baseAddress].UnregisterSwappedBytes(this);
+			auto got = Memory::ModuleJumpTable::jumpTables.find(baseAddress);
+			if (got != Memory::ModuleJumpTable::jumpTables.end()) {
+				got->second.UnregisterSwappedBytes(this);
+			}
 
 			this->src = NULL;
 			delete[] this->originalBytes;
@@ -86,13 +93,7 @@ namespace HookLibrary {
 
 		SwappedBytes Nop(BYTE* dst, SIZE_T size) {
 			SwappedBytes swappedBytes(dst, size);
-			DWORD currentProtection;
-
-			VirtualProtect(dst, size, PAGE_EXECUTE_READWRITE, &currentProtection);
-
-			memset(dst, 0x90, size);
-			VirtualProtect(dst, size, currentProtection, &currentProtection);
-
+			Memory::Nop(dst, size);
 			return swappedBytes;
 		}
 
